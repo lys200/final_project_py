@@ -1,3 +1,10 @@
+'''id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_prof TEXT PRYMARY KEY, 
+                nom_prof TEXT NOT NULL,
+                prenom_prof TEXT NOT NULL,
+                tel_prof TEXT NOT NULL,
+                email TEXT NOT NULL'''
+
 import Databases_pack.database as db
 from gestion_des_contraintes.contraintes import is_empty
 """CREATE TABLE IF NOT EXISTS Salles (

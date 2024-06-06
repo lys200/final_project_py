@@ -134,20 +134,21 @@ class Gestion_Batiment:
             print('\t','-'*32)
             print("Bienvenue au menu Batiments.")
             print("Veuillez choisir votre option.")
-            if self.adm_id :
-                print("1- Enregistrer un batiment.")
-                print("2- Lister les batiments.")
-                print("3- Rechercher les information d'un batiment.")
-                print("4- Supprimer un batiment.")
-                print("5- Retour au menu principal.")
-                try:
-                    choix = int(input("choix [1-5]: \n -->"))
-                except Exception as e:
-                    print("Erreur veuiller entrer un entier valide: ", e)
+            print("1- Enregistrer un batiment.")
+            print("2- Lister les batiments.")
+            print("3- Rechercher les information d'un batiment.")
+            print("4- Supprimer un batiment.")
+            print("5- Retour au menu principal.")
+            print("6-Quitter le programme.")
+            try:
+                choix = int(input("choix [1-6]: \n -->"))
+            except Exception as e:
+                print("Erreur veuiller entrer un entier valide: ", e)
+            else:
+                if choix < 1 or choix > 6:
+                    print("Veuillez choisir un chiffre entre 1 et 6")
                 else:
-                    if choix < 1 or choix > 5:
-                        print("Veuillez choisir un chiffre entre 1 et 5")
-                    else:
+                    if self.adm_id :
                         if choix == 1:
                             self.enregistrer()
                         elif choix == 2:
@@ -157,20 +158,10 @@ class Gestion_Batiment:
                         elif choix == 4:
                             self.supprimer()
                         elif choix == 5:
-                            break   
-            else:
-                print("1- Enregistrer un batiment.")
-                print("2- Lister les batiments.")
-                print("3- Rechercher les information d'un batiment.")
-                print("4- Supprimer un batiment.")
-                print("5- Retour au menu principal.")
-                try:
-                    choix = int(input("choix [1-5]:\n -->"))
-                except Exception as e:
-                    print("Erreur veuiller entrer un entier valide: ", e)
-                else:
-                    if choix < 1 or choix > 5:
-                        print("Entrée invalide. Veuillez choisir un chiffre entre 1 et 5.\n")
+                            break 
+                        else:
+                            print("\n\tFermeture du programme...\n")
+                            exit()  
                     else:
                         if choix == 1:
                             print("Accès interdit. Seuls les admins peuvent faire des enregistrements.\n")
@@ -182,4 +173,8 @@ class Gestion_Batiment:
                             print("Accès interdit. Seuls les admins peuvent faire des Suppressions.\n")
                         elif choix == 5:
                             break   
+                        else:
+                            print("\n\tFermeture du programme...\n")
+                            exit()
+
 

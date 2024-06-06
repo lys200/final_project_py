@@ -182,7 +182,7 @@ def search_by_data(conn, table_name, column_name, search_value):
     rows = cursor.fetchall()
     return rows
 
-def update_data(conn, table_name,  id_entite, **kwargs):
+def update_data(conn, table_name,  id_entite, id_value,**kwargs):
     """Fonction pour modifier les donnees d'une table"""
     #prend en parametres: la conn, le nom de la table, le nom de la cle primaire, 
     #la valeur de l'id a modifier ainsi que l'ensenbles des colonnes a modifier , 
@@ -191,10 +191,10 @@ def update_data(conn, table_name,  id_entite, **kwargs):
     columns = ', '.join(f'{key} = ?' for key in kwargs)
     print("cols =", columns)
     #values = tuple(kwargs.values())
-    values = tuple(kwargs.values()) + (id_entite,)
+    values = tuple(kwargs.values()) + (id_value,)
     print("vas =", values)
     # Préparer la requête de mise à jour
-    query = f'UPDATE {table_name} SET {columns} WHERE id_batiment = ?'
+    query = f'UPDATE {table_name} SET {columns} WHERE {id_entite} = ?'
     print("query=", query)
     # Exécuter la requête avec les valeurs fournies
     curseur.execute(query, values)
@@ -206,7 +206,13 @@ def delete_database(conn, table_name, id_name, id_value):
     #prend en parametres: la conn, le nom de la table, le nom de la cle primaire, 
     #la valeur de l'id a supprimer
     curseur = conn.cursor()
+    print(table_name)
+    print(id_name)
+    print(id_value)
+
     query = f"DELETE FROM {table_name} WHERE {id_name} = ?"
+    print(query, id_value)
+    
     curseur.execute(query,  id_value)
     conn.commit()
 
