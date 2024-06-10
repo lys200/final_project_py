@@ -1,6 +1,8 @@
 import gestion_des_entites.Gestion_admin as adm
 import gestion_des_entites.Gestion_batiments as bat 
 import gestion_des_entites.Gestion_salles as sal
+import gestion_des_entites.Gestion_professeurs as prof
+import gestion_des_entites.Gestion_cours as crs
 
 def menu_pricipal(adm_id):
     print(adm_id, 'id menu principal')
@@ -13,7 +15,7 @@ def menu_pricipal(adm_id):
         print("1- Gestion des batiments.")
         print("2- Gestion des salles.")
         print("3- Gestion des cours.")
-        print("4- Gestion des horaires.")
+        print("4- Gestion des horaires.(to do)")
         print("5- Gestion des Professeurs.")
         print("6- Retour au menu Système.")
         print("7- Fermer le programme.")
@@ -32,11 +34,13 @@ def menu_pricipal(adm_id):
                     salle = sal.Gestion_Salle(adm_id)
                     salle.menu_salle()
                 elif choix_1 == 3:
-                    pass
+                    cours = crs.Gestion_Cours(adm_id)
+                    cours.menu_cours()
                 elif choix_1 == 4:
                     pass
                 elif choix_1 == 5:
-                    pass
+                    professeur = prof.Gestion_Professeur(adm_id)
+                    professeur.menu_professeur()
                 elif choix_1 == 6:
                     main()
                 elif choix_1 == 7:

@@ -7,6 +7,7 @@ import sqlite3
 def connect_to_database(conn_name):
     """connection a la database"""
     return sqlite3.connect(conn_name)
+
 def initialize_conn(conn):
     """initialisation de la base de donnee"""
     try:
@@ -55,9 +56,10 @@ def initialize_conn(conn):
             """CREATE TABLE IF NOT EXISTS Cours (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_cours TEXT, 
-                nom_cours TEXT NOT NULL,
-                id_prof TEXT NOT NULL,
+                nom_cours TEXT,
                 nom_fac TEXT,
+                niveau INTEGER NOT NULL,
+                id_prof TEXT NOT NULL,
                 duree REAL NOT NULL)
         """)
 
@@ -71,7 +73,7 @@ def initialize_conn(conn):
             FOR EACH ROW
             BEGIN
                 UPDATE Cours
-                SET id_cours = substr(NEW.nom_cours, 1, 3) || "_" || substr(NEW.nom_fac, 1, 3) || NEW.id
+                SET id_cours = substr(NEW.nom_cours, 1, 3) || "_" || substr(NEW.nom_fac, 1, 3)|| "_" ||'L'|| NEW.niveau
                 WHERE id = NEW.id;
             END; ''') 
 
@@ -96,7 +98,21 @@ def initialize_conn(conn):
             FOR EACH ROW
             BEGIN
                 UPDATE Professeurs
-                SET id_cours = substr(NEW.nom_prof, 1, 3) || substr(NEW.prenom_prof, 1, 3) || NEW.id
+                SET id_prof = substr(NEW.nom_prof, 1, 3) || substr(NEW.prenom_prof, 1, 3) || NEW.id
+                WHERE id = NEW.id;
+            END;
+        ''')
+        #declencheur pour mettre a jour l'id apres modification de la table professeurs
+        curseur.execute('''
+            DROP TRIGGER IF EXISTS after_update_prof
+        ''')
+        curseur.execute('''
+            CREATE TRIGGER after_update_prof
+            AFTER UPDATE ON Professeurs
+            FOR EACH ROW
+            BEGIN
+                UPDATE Professeurs
+                SET id_prof = substr(NEW.nom_prof, 1, 3) || substr(NEW.prenom_prof, 1, 3) || NEW.id
                 WHERE id = NEW.id;
             END;
         ''')
@@ -158,9 +174,9 @@ def insert_data(conn, table_name, **kwargs):
     else:
         print("Insertion réussie!!!")
 
+def read_database(conn, table_name):
 #cette fonction prend en param la table en question et la base de donnee
 #puis retourne les donnees de la table en question
-def read_database(conn, table_name):
     """fonction de lecture des tables de la base de donnees"""
     try:
         curseur = conn.cursor()
@@ -196,6 +212,7 @@ def update_data(conn, table_name,  id_entite, id_value,**kwargs):
     # Préparer la requête de mise à jour
     query = f'UPDATE {table_name} SET {columns} WHERE {id_entite} = ?'
     print("query=", query)
+    print(id_value)
     # Exécuter la requête avec les valeurs fournies
     curseur.execute(query, values)
     conn.commit()
@@ -213,7 +230,7 @@ def delete_database(conn, table_name, id_name, id_value):
     query = f"DELETE FROM {table_name} WHERE {id_name} = ?"
     print(query, id_value)
     
-    curseur.execute(query,  id_value)
+    curseur.execute(query,  (id_value,))
     conn.commit()
 
 def verify_data(conn, table_name, column_name, valeur):
@@ -256,3 +273,12 @@ def verify_column(conn, table_name, column_name):
     except sqlite3.Error as e:
         print(f"Erreur SQLite: {e}")
         return False
+
+def filter_table(cursor, table_name, filters):
+    """Permet d'afficher autant de filtre possible a une table."""
+    where_clause = " AND ".join([f"{col} = ?" for col in filters.keys()])
+    print(where_clause)
+    query = f"SELECT * FROM {table_name} WHERE {where_clause}"
+    print(query)
+    cursor.execute(query, tuple(filters.values()))
+    return cursor.fetchall()

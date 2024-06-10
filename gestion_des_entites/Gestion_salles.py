@@ -76,7 +76,7 @@ class Gestion_Salle:
             print("\nAucune salle n'est encore enregistrée.\n")
         else:
             print("Voici les informations enregistrées concernant les Salles:\n ")
-            print("indexes|Salles|num_salle|id_salle | etage | nombre de siege|statut |")
+            print("indexes|Salles|numero |batiment | etage | nombre de siege|statut |")
             for data in datas:
                 print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4], "\t", data[5],"\t", data[6])
 
@@ -117,7 +117,7 @@ class Gestion_Salle:
                 room_id = is_empty("Entrer l'id de la salle a afficher:\n --> ")
                 if db.verify_data(self.curseur, "Salles", "id_salle", room_id) == True:
                     datas = db.search_by_data(self.curseur, "Salles","id_salle", room_id)
-                    print("index|Salles|num_salle|id_salle | etage | nombre de siege|statut |")
+                    print("index|Salles|num_salle|batiment | etage | nombre de siege|statut |")
                     for data in datas:
                         print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4], "\t", data[5],"\t", data[6])
                 else:
@@ -129,7 +129,7 @@ class Gestion_Salle:
                 if datas == []:
                     print(f"Aucun batiment ne contient {numero_salle} salle(s).")
                 else:
-                    print("indexes|Salles|num_salle|id_salle | etage | nombre de siege|statut |")
+                    print("indexes|Salles|num_salle|batiment | etage | nombre de siege|statut |")
                     for data in datas:
                         print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4], "\t", data[5],"\t", data[6])
             
@@ -147,7 +147,7 @@ class Gestion_Salle:
                             if not datas:
                                  print(f"Aucune salle n'est enregistrée a l'étage {num_etage}")
                             else:
-                                print("indexes|Salles|num_salle|id_salle | etage | nombre de siege|statut |")
+                                print("indexes|Salles|num_salle|Batiment | etage | nombre de siege|statut |")
                                 for data in datas:
                                     print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4], "\t", data[5],"\t", data[6])
                                 break
@@ -155,12 +155,14 @@ class Gestion_Salle:
                 id_batiment = is_empty("Entrer l'id du batiment dont vous voulez afficher les salles:\n -->")
                 if db.verify_data(self.curseur, "Salles","id_batiment", id_batiment):
                     datas = db.search_by_data(self.curseur, "Salles", "id_batiment", id_batiment)
-                    print(f"Voici les informations des salles se trouvant au batiment {id_batiment}.\n")
-                    print("_"*42)
-                    print("indexes|Salles|num_salle|id_salle | etage | nombre de siege|statut |")
-                    for data in datas:
-                        print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4], "\t", data[5],"\t", data[6])
-    
+                    if datas:
+                        print(f"Voici les informations des salles se trouvant au batiment {id_batiment}.\n")
+                        print("_"*42)
+                        print("indexes|Salles|num_salle|batiment | etage | nombre de siege|statut |")
+                        for data in datas:
+                            print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4], "\t", data[5],"\t", data[6])
+                else:
+                    print("Ce batiment n'est pas enregistré dans la base de donnée.")
             elif choix == '5':
                 while True:
                     try:
@@ -176,7 +178,7 @@ class Gestion_Salle:
                                  print(f"Aucune salle ne contient {sieges} sièges")
                             else:
                                 print(f"Voici la liste des salles contenant {sieges} sièges.")
-                                print("indexes|Salles|num_salle|id_salle | etage | nombre de siege|statut |")
+                                print("indexes|Salles|num_salle|batiment | etage | nombre de siege|statut |")
                                 for data in datas:
                                     print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4], "\t", data[5],"\t", data[6])
                                 break
@@ -187,6 +189,7 @@ class Gestion_Salle:
                 exit()
             else:
                 print("Entrée invalide, Veuillez choisir entre les options proposées.")
+   
     def supprimer(self):
         id_salle = is_empty("Entrer l'id de la salle a supprimer:\n --> ")
         if db.verify_data(self.curseur, "Salles", "id_salle", id_salle):
@@ -220,11 +223,11 @@ class Gestion_Salle:
             print("6- Retour au menu principal.")
             print("7- Quitter le programme.")
             try:
-                choix = int(input("Veuillez choisir votre option.[1-7]: "))
+                choix = int(input("Veuillez choisir votre option.[1-7]: \n -->"))
             except Exception as e:
                 print("Erreur veuiller entrer un entier valide: ", e)
             else:
-                if choix < 1 or choix > 6:
+                if choix < 1 or choix > 7:
                     print("Veuillez choisir un chiffre entre 1 et 7")
                 else:
                     if self.adm_id :

@@ -75,9 +75,10 @@ class Gestion_Batiment:
             print('\t','-'*32)
             print("Pour faire une recherche par filtre , vous devez choisir parmi les options suivantes")
             print("1- Rechercher par id_batiment")
-            print("2- Rechercher par nombre de salle")
-            print("3- Rechercher par Nombre d'étage")
-            print("4- Retour au menu batiment.")
+            print("2- Afficher les salles d'un batiment")
+            print("3- Rechercher par nombre de salle")
+            print("4- Rechercher par Nombre d'étage")
+            print("5- Retour au menu batiment.")
             choix = input("Faites votre choix: ")
             if choix == '1':
                 id_batiment = is_empty("Entrer l'id du Batiment a afficher: \n --> ")
@@ -89,6 +90,18 @@ class Gestion_Batiment:
                 else:
                     print("Ce batiment n'est pas enregistré dans la base de données.")
             elif choix == '2':
+                id_batiment = is_empty("Entrer l'id du batiment dont vous voulez afficher les salles:\n -->")
+                if db.verify_data(self.curseur, "Salles","id_batiment", id_batiment):
+                    datas = db.search_by_data(self.curseur, "Salles", "id_batiment", id_batiment)
+                    if datas:
+                        print(f"Voici les informations des salles se trouvant au batiment {id_batiment}.\n")
+                        print("_"*42)
+                        print("indexes|Salles|num_salle|batiment | etage | nombre de siege|statut |")
+                        for data in datas:
+                            print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4], "\t", data[5],"\t", data[6])
+                else:
+                    print("Ce batiment n'est pas enregistré dans la base de donnée.")
+            elif choix == 3:
                 nbre_salle = input("Entrer le nombre de salle: ")
                 datas = db.search_by_data(self.curseur, "Batiments","salle_de_cours", nbre_salle)
                 if datas == []:
@@ -97,7 +110,7 @@ class Gestion_Batiment:
                     print("indexes|batiments|étages|salles| salles disponibles")
                     for data in datas:
                         print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4],"\n")
-            elif choix == '3':
+            elif choix == '4':
                 nbre_etage = is_empty("Entrer le nombre de salle: \n -->")
                 datas = db.search_by_data(self.curseur, "Batiments","nombre_etages", nbre_etage)
                 if datas == []:
@@ -106,7 +119,7 @@ class Gestion_Batiment:
                     print("indexes|batiments|étages|salles| salles disponibles")
                     for data in datas:
                         print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4],"\n")
-            elif choix == '4':
+            elif choix == '5':
                 break
 
     def supprimer(self):
@@ -116,8 +129,24 @@ class Gestion_Batiment:
                 print(f"Etesvous sur de vouloir supprimer le batiment {id_batiment}?")
                 choix = input("1- Supprimer 2- Annuler\n -->")
                 if choix == '1':
+                    #suppression des salles de ce batiment
+                    #recuperantion des id des ces salles
+                    salles = db.search_by_data(self.curseur, "Salles", "id_batiment", id_batiment)
+                    if salles:
+                        salles_to_delete = []
+                        for salle in salles:
+                            salles_to_delete.append(salle[1])
+
+                        #supprimer les salles de la liste salle_to_delete dans une boucle
+                        for id_ in salles_to_delete:
+                            print(f'suppresion de la salle {id_} du batiment {id_batiment}')
+                            db.delete_database(self.curseur, "Salles", "id_salle", id_)
+                        
+                        
+                   
+                   #suppression du batiment
                     db.delete_database(self.curseur, "Batiments", "id_batiment", id_batiment)
-                    print("Suppression effectuée!")
+                    print(f"\nSuppression {id_batiment} et de toutes ses salles effectuée!")
                     break
                 elif choix == '2':
                     break
