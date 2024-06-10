@@ -8,3 +8,4 @@
 suppression batiment-> suppression salles-> supression horaire salle.
 to do in gestion batiment: suppression horaires
 to do in gestion salles: suppressions salle -> sup horaire
+to do in gestioncours: suppression cours -> sup horaire
