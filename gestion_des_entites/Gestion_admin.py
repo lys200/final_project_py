@@ -2,12 +2,13 @@
 
 import Databases_pack.database as db
 from gestion_des_contraintes.contraintes import * 
-class Gestion_admin:
-    def __init__(self) -> None:
+
+class Gestion_admin(Person):
+    def __init__(self):
         self.curseur = db.connect_to_database("Gestion_des_salles.db")
         db.initialize_conn(self.curseur)
         self.adm_id = ""
-        
+    
     def Connection_adm(self):
         id_adm = is_empty("Entrer votre id: ")
         is_adm = db.search_by_data(self.curseur, "Administrateurs", "id_admin",id_adm,)
@@ -23,10 +24,21 @@ class Gestion_admin:
             return False
 
     def new_adm_account(self):
-        nom = is_empty("Entrer Votre nom: \n- ")
-        prenom = is_empty("Entrer Votre prenom: \n")
+        personne = Person()
+        nom = personne.f_name()
+        if nom.lower() == 'x':
+            return
+        prenom = personne.l_name()
+        if prenom.lower() == 'x':
+            return
+        
+        #nom = is_empty("Entrer Votre nom: (x pour quitter) \n- ")
+        #prenom = is_empty("Entrer Votre prenom: \n")
         while True:
-            password = is_empty("Entrer votre mot de passe:au moins[1 majuscule, 1 chiffre, et 1 caractere special, longueur =8 min] ")
+            print("Entrer votre mot de passe:\n(au moins 1 majuscule, 1 chiffre, et 1 caractere special, longueur =8 min)\n ")
+            password = is_empty("x pour quitter.\n -->")
+            if password.lower() == 'x':
+                return
             if is_valid_password(password):
                 break
             else:
@@ -37,17 +49,17 @@ class Gestion_admin:
         print(f"\nBienvenue {nom} {prenom}! Vous etes maintenant administrateurs. ")
         print("Une id vous a été attribuée. Veuillez afficher les admins pour récupérer le votre.\n")
         
-
-
     def show_adm_accounts(self):
         datas = db.read_database(self.curseur, "Administrateurs")
         if datas:
             print("\tVoici la liste des administrateurs enregistrés: ")
-            print("\tIndex\t|id\t\t|Nom\t|Prenom\t|Password |")
+            columns = ['Index', 'identifiant', 'Nom', 'Prenom', 'Password']
+            display_list_columns(columns)
+        
             for data in datas:
-                print("\t",data[0], "\t|", data[1], "|", data[2],"|", data[3],"|","********* |")
+                display_list_columns(data)
         else:
-            print("Aucun administrateurs n'est encore enregistré.")
+            print("Aucun administrateur n'est encore enregistré.")
     
     def menu_adm (self):
         print('\n\t','-'*8,"MENU D'AUTHENTIFICATION",'-'*8)

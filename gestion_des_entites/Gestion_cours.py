@@ -1,12 +1,12 @@
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes import is_empty, display_list_columns
+from gestion_des_contraintes.contraintes import is_empty, verifier_format_heure_v2,display_list_columns
 """CREATE TABLE IF NOT EXISTS Cours (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_cours TEXT, 
                 nom_cours TEXT NOT NULL,
                 id_prof TEXT NOT NULL,
                 nom_fac TEXT,
-                duree REAL NOT NULL)
+                duree TEXT NOT NULL)
         """ 
 class Gestion_Cours:
     """Class contenant toutes les fonctions relative a la gestion des Salles"""
@@ -77,22 +77,37 @@ class Gestion_Cours:
                             return
                         else:
                             print("Vous devez choisir entre 1 et 2.")
-
             while True:
-                duree = is_empty("Entrer la durée du cours(en heure): \n(x pour quitter)\n -->").lower()
-                if duree == 'x':
+                print("Entrer la durée du cours(HH:MM format 24h): ")
+                duree = is_empty("(x pour quitter)\n -->")
+                if duree.lower() ==  'x':
                     return
-                else:
-                    try:
-                        duree = float(duree)
-                    except Exception as e:
-                        print("L'entrée doit etre un decimal/entier:")
+                elif verifier_format_heure_v2(duree):
+                    heure_h, minute_m = map(int, duree.split(':'))
+                    total_minutes = heure_h * 60 + minute_m
+                    if (total_minutes > 60) and (total_minutes < 360):
+                        db.insert_data(self.curseur, 'Cours', nom_cours = nom, nom_fac = fac, niveau = niveau, id_prof = prof, duree = duree)
+                        break
                     else:
-                        if duree < 0 or duree > 4:
-                            print("Un cours ne peut pas durer plus de 6 heures")
+                        print("La durée ne doit pas etre inferieure a 1h ou superieure a 6h.")
+                        print("1- reassayer         2- abandonner l'enregistrement")
+                        ch = input(" --> ")
+                        if ch == '1':
+                            pass
+                        elif ch == '2':
+                            return
                         else:
-                            db.insert_data(self.curseur, 'Cours', nom_cours = nom, nom_fac = fac, niveau = niveau, id_prof = prof, duree = duree)
-                            break
+                            print('Choisissez entre 1 et 2')
+                else:
+                    print("Format d'heure invalide.")
+                    print("1- reassayer         2- abandonner l'enregistrement")
+                    ch = input(" --> ")
+                    if ch == '1':
+                        pass
+                    elif ch == '2':
+                        return
+                    else:
+                        print('Choisissez entre 1 et 2')
                     
     def lister(self):
         """Lister tous les Cours de la table Cours"""
@@ -117,7 +132,7 @@ class Gestion_Cours:
                 print('\t','-'*8,"MENU MODIFIER Cours",'-'*8)
                 print('\t','-'*32)
                 print("Veuillez choisir entre les parmi options de modification suivantes: ")
-                print("1- Modifier le id du professeur.")
+                print("1- Modifier l'id du professeur.")
                 print("2- Modifier la durée du cours.")
                 print("3- Retour au menu Cours.")
                 print("4- Quitter le programme. ")
@@ -125,18 +140,15 @@ class Gestion_Cours:
                 choix = is_empty("Faites votre choix:\n -->")
                 if choix == '1':
                     while True:
-                        prof = is_empty("Entrer le nouveau id du professeur (x pour quitter): \n -->")
+                        prof = is_empty("Entrer le nouveau id du professeur\n(x pour quitter): \n -->")
                         if prof == 'x':
                             break  
+                        elif db.verify_data(self.curseur, "Professeurs", "id_prof", prof):
+                            #insertion du nouveau prof dans la table cours
+                            db.update_data(self.curseur, "Cours", "id_cours", id_cours, id_prof = prof)
+                            break
                         else:
-                            is_prof = db.search_by_data(self.curseur, "Professeurs", "id_prof", prof)
-                            #insertion des donnees dans la table batiments
-                            if is_prof:
-                                db.update_data(self.curseur, "Cours", "id_cours", id_cours, id_prof = prof)
-                                print("Modification effectuée...")
-                                break
-                            else:
-                                print(f"Le professeur {is_prof} n'est pas enregistré dans la table des professeurs.")
+                                print(f"Le professeur {prof} n'est pas enregistré dans la table des professeurs.")
                                 print("Veuillez d'abord l'enregistrer dans le menu 'Professeurs'.\n")
                                 ch = is_empty("1- Reessayer 2-Abandonner la modification.\n -->")
                                 if ch == "1":
@@ -148,21 +160,36 @@ class Gestion_Cours:
 
                 elif choix == '2':      
                     while True:
-                        duree = is_empty("Entrer la nouvelle durée du cours: (x pour quitter)\n -->").lower()
-                        if duree == 'x':
-                            break
-                        else:
-                            try:
-                                duree = float(duree)
-                            except Exception as e:
-                                print("L'entrée doit etre un decimal/entier:")
+                        print("Entrer la nouvelle durée du cours(HH:MM format 24h): ")
+                        duree = is_empty("(x pour quitter)\n -->")
+                        if duree.lower() ==  'x':
+                            return
+                        elif verifier_format_heure_v2(duree):
+                            heure_h, minute_m = map(int, duree.split(':'))
+                            total_minutes = (heure_h * 60) + minute_m
+                            if total_minutes < 60 or total_minutes > 360:
+                                db.update_data(self.curseur, "Cours", 'id_cours', id_cours, duree = duree)
+                                break
                             else:
-                                if duree < 0 or duree > 4:
-                                    print("Un cours ne peut pas durer plus de 6 heures")
+                                print("La durée ne doit pas etre inferieure a 1h ou superieure a 6h.")
+                                print("1- reassayer         2- abandonner l'enregistrement")
+                                ch = input(" --> ")
+                                if ch == '1':
+                                    pass
+                                elif ch == '2':
+                                    return
                                 else:
-                                    db.update_data(self.curseur, 'Cours',"id_cours",id_cours, duree = duree)
-                                    print("Mise a jour effectuée")
-                                    break
+                                    print('Choisissez entre 1 et 2')
+                        else:
+                            print("Format d'heure invalide.")
+                            print("1- reassayer         2- abandonner l'enregistrement")
+                            ch = input(" --> ")
+                            if ch == '1':
+                                pass
+                            elif ch == '2':
+                                return
+                            else:
+                                print('Choisissez entre 1 et 2')
 
                 elif choix == "3":
                     break #or return

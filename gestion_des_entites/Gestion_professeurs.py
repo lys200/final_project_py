@@ -1,5 +1,5 @@
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes import is_empty, is_valid_email, is_valid_phone_number, display_list_columns
+from gestion_des_contraintes.contraintes import is_empty, is_valid_email, is_valid_phone_number, display_list_columns, Person
 '''id INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_prof TEXT PRYMARY KEY, 
                 nom_prof TEXT NOT NULL,
@@ -13,24 +13,20 @@ class Gestion_Professeur:
     def __init__(self, adm_id):
         self.curseur = db.connect_to_database("Gestion_des_salles.db")
         self.adm_id = adm_id
+        self.personne = Person()
         db.initialize_conn(self.curseur)
         
     def enregistrer(self):
         """Enregistre un nouveau professeur"""
-        nom = is_empty("Entrer le nom du professeur: (x pour quitter)\n -->")
-        if nom == 'x':
+        nom = self.personne.f_name()
+        if nom.lower() == 'x':
             return   
-        prenom = is_empty("Entrer le prenom du professeur: (x pour quitter)\n -->")
-        if prenom == 'x':
+        prenom = self.personne.l_name()
+        if prenom.lower() == 'x':
             return
-        while True:
-            email = is_empty("Entrer l'email du prof: \n -->")
-            if email == 'x':
-                return
-            elif is_valid_email(email):
-                break
-            else:
-                print("Email invalide.\nExemple: something@domain.com")
+        email = self.personne.mail()
+        if not email:
+            return
         while True:
             tel = is_empty("Entrer le telephone du prof: (x pour quitter)\n -->")
             if tel == 'x':
@@ -75,16 +71,16 @@ class Gestion_Professeur:
 
                 choix = is_empty("Faites votre choix:\n -->")
                 if choix == '1':
-                    nom = is_empty("Entrer le nouveau nom du professeur (x pour quitter): \n -->")
-                    if nom == 'x':
+                    nom = self.personne.l_name()
+                    if nom.lower() == 'x':
                         return  
                     else:
                         db.update_data(self.curseur, "Professeurs", "id_prof", id_Professeur,  nom_prof = nom) 
                         print("Mise a jour effectuée")
 
                 elif choix == '2':
-                    prenom = is_empty("Entrer le nouveau prenom du professeur: (x pour quitter)\n -->")
-                    if prenom == 'x':
+                    prenom = self.personne.f_name()
+                    if prenom.lower() == 'x':
                         return
                     else:
                         db.update_data(self.curseur, "Professeurs", "id_prof", id_Professeur,  prenom_prof = prenom)
@@ -107,8 +103,8 @@ class Gestion_Professeur:
                             print("1234567890")      # True
                 elif choix == '4':
                     while True:
-                        email = is_empty("Entrer la npuvelle adresse mail du prof: \n -->")
-                        if email == 'x':
+                        email = self.personne.email()
+                        if email.lower() == 'x':
                             return
                         elif is_valid_email(email):
                             db.update_data(self.curseur, "Professeurs", "id_prof", id_Professeur,  email = email)

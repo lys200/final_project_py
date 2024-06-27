@@ -4,9 +4,9 @@
 """
 import sqlite3
 
-def connect_to_database(conn_name):
+def connect_to_database(db_name):
     """connection a la database"""
-    return sqlite3.connect(conn_name)
+    return sqlite3.connect(db_name)
 
 def initialize_conn(conn):
     """initialisation de la base de donnee"""
@@ -50,7 +50,6 @@ def initialize_conn(conn):
                 where id = NEW.id;
             END;
         ''')
-
         #creation de la table cours
         curseur.execute(
             """CREATE TABLE IF NOT EXISTS Cours (
@@ -60,7 +59,7 @@ def initialize_conn(conn):
                 nom_fac TEXT,
                 niveau INTEGER NOT NULL,
                 id_prof TEXT NOT NULL,
-                duree REAL NOT NULL)
+                duree TEXT NOT NULL)
         """)
 
         #creation du declencheur pour la table cours
@@ -121,9 +120,12 @@ def initialize_conn(conn):
             """CREATE TABLE IF NOT EXISTS Horaire (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 code_cours TEXT NOT NULL,
+                nom_cours TEXT NOT NULL,
                 code_salle TEXT NOT NULL,
                 jour TEXT NOT NULL,
-                session INTEGER NOT NULL,
+                heure_debut TEXT NOT NULL,
+                heure_fin TEXT NOT NULL,
+                session TEXT NOT NULL,
                 annee INTEGER NOT NULL)
         """)
         #creation de la table des administrateurs
@@ -274,11 +276,54 @@ def verify_column(conn, table_name, column_name):
         print(f"Erreur SQLite: {e}")
         return False
 
-def filter_table(cursor, table_name, filters):
-    """Permet d'afficher autant de filtre possible a une table."""
-    where_clause = " AND ".join([f"{col} = ?" for col in filters.keys()])
-    print(where_clause)
+def filter_table(conn, table_name, **args):
+    """
+    Permet d'afficher autant de filtres possibles pour une table en utilisant des arguments nommés.
+    """
+    """
+    :param cursor: Le curseur de la base de données.
+    :param table_name: Le nom de la table dans laquelle effectuer la recherche.
+    :param args: Les paires colonne=valeur pour filtrer les résultats.
+    :return: Les résultats de la requête filtrée.
+    """
+    curseur = conn.cursor()
+
+    if not args:
+        query = f"SELECT * FROM {table_name}"
+        curseur.execute(query)
+        return curseur.fetchall()
+
+    where_clause = " AND ".join([f"{col} = ?" for col in args.keys()])
     query = f"SELECT * FROM {table_name} WHERE {where_clause}"
-    print(query)
-    cursor.execute(query, tuple(filters.values()))
-    return cursor.fetchall()
+    curseur.execute(query, tuple(args.values()))
+    datas = curseur.fetchall()
+    return datas
+
+def verifier_conflit(conn, jour,session, annee, heure_debut, heure_fin):
+    """
+    Vérifie si un cours existe déjà dans l'intervalle de temps donné.
+    """
+    """
+    :param jour: Jour du cours (e.g., 'lundi')
+    :param heure_debut: Heure de début du cours (e.g., '10:00')
+    :param heure_fin: Heure de fin du cours (e.g., '12:00')
+    :param session: session durant laquelle on donne le cours
+    :param annee: l'annee du cours
+    :return: True si un conflit est détecté, False sinon
+    """
+    curseur = conn.cursor()
+
+    query = '''
+    SELECT 1 FROM Horaire
+    WHERE jour = ?
+    AND session = ?
+    AND annee = ?
+    AND (
+        (heure_debut <= ? AND heure_fin > ?)
+        OR (heure_debut < ? AND heure_fin >= ?)
+        OR (heure_debut >= ? AND heure_fin <= ?)
+    )
+    '''
+    curseur.execute(query, (jour, session, annee, heure_fin, heure_debut, heure_debut, heure_fin, heure_debut, heure_fin))
+    return curseur.fetchone() is not None
+

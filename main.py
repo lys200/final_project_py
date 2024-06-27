@@ -3,6 +3,7 @@ import gestion_des_entites.Gestion_batiments as bat
 import gestion_des_entites.Gestion_salles as sal
 import gestion_des_entites.Gestion_professeurs as prof
 import gestion_des_entites.Gestion_cours as crs
+import gestion_des_entites.Gestion_horaires as hor
 
 def menu_pricipal(adm_id):
     print(adm_id, 'id menu principal')
@@ -37,7 +38,8 @@ def menu_pricipal(adm_id):
                     cours = crs.Gestion_Cours(adm_id)
                     cours.menu_cours()
                 elif choix_1 == 4:
-                    pass
+                    horaire = hor.Gestion_Horaire(adm_id)
+                    horaire.menu_horaire()
                 elif choix_1 == 5:
                     professeur = prof.Gestion_Professeur(adm_id)
                     professeur.menu_professeur()
