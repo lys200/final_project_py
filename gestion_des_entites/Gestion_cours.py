@@ -150,13 +150,14 @@ class Gestion_Cours:
                         else:
                                 print(f"Le professeur {prof} n'est pas enregistré dans la table des professeurs.")
                                 print("Veuillez d'abord l'enregistrer dans le menu 'Professeurs'.\n")
-                                ch = is_empty("1- Reessayer 2-Abandonner la modification.\n -->")
-                                if ch == "1":
-                                    pass
-                                elif ch == '2':
-                                    break
-                                else:
-                                    print("Vous devez choisir entre 1 et 2.")
+                                while True:
+                                    ch = is_empty("1- Reessayer 2-Abandonner la modification.\n -->")
+                                    if ch == "1":
+                                        break
+                                    elif ch == '2':
+                                        self.modifier()
+                                    else:
+                                        print("Vous devez choisir entre 1 et 2.")
 
                 elif choix == '2':      
                     while True:
@@ -166,20 +167,21 @@ class Gestion_Cours:
                             return
                         elif verifier_format_heure_v2(duree):
                             heure_h, minute_m = map(int, duree.split(':'))
-                            total_minutes = (heure_h * 60) + minute_m
-                            if total_minutes < 60 or total_minutes > 360:
+                            total_minutes = heure_h * 60 + minute_m
+                            if total_minutes > 60 and total_minutes < 360:
                                 db.update_data(self.curseur, "Cours", 'id_cours', id_cours, duree = duree)
                                 break
                             else:
                                 print("La durée ne doit pas etre inferieure a 1h ou superieure a 6h.")
-                                print("1- reassayer         2- abandonner l'enregistrement")
-                                ch = input(" --> ")
-                                if ch == '1':
-                                    pass
-                                elif ch == '2':
-                                    return
-                                else:
-                                    print('Choisissez entre 1 et 2')
+                                while True:
+                                    print("1- reassayer         2- abandonner l'enregistrement")
+                                    ch = input(" --> ")
+                                    if ch == "1":
+                                        break
+                                    elif ch == '2':
+                                        self.modifier()
+                                    else:
+                                        print("Vous devez choisir entre 1 et 2.")
                         else:
                             print("Format d'heure invalide.")
                             print("1- reassayer         2- abandonner l'enregistrement")

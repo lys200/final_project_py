@@ -10,3 +10,8 @@ to do in gestion batiment: suppression horaires
 to do in gestion salles: suppressions salle -> sup horaire
 to do in gestioncours: suppression cours -> sup horaire
 to do in gestioncours: modify duree cours -> modify horaire cours
+to do in gestion cours: supp prof -> sup id prof dans table Coure -> suppression de ces cours dan l'horaire car un cours ne peut pas se dispenser sans prof
+to do in gestion batiment: ajouter salle -> decrease salle dispo batiment
+TO-DO  in gestion salle, Entrer l'id du batiment dont vous voulez afficher les salles:
+                            -->B
+                            Ce batiment n'est pas enregistré dans la base de donnée.

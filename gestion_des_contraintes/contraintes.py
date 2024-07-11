@@ -6,11 +6,19 @@ import re
 import hashlib
 import os
 from sys import platform
-
+from time import sleep
+def banner():
+    phrase = "Projet Gestion des salles du Campus Henry Chistophe de Limonade"
+    longueur_phrase = len(phrase)
+    print(" " * 10,"+" + "-" * (longueur_phrase + 2) + "+")
+    print(" " * 10,"| " + phrase + " |")
+    print(" " * 10,"+" + "-" * (longueur_phrase + 2) + "+")
+    print("\n\n")
 def is_empty(input_message):
     """Verifie que le champs rempli par le user n'est pas vide."""
     while True:
-        user_input = input(input_message).strip()
+        print('\n',' '*20,input_message)
+        user_input = input("                    -->").strip()
         if user_input:
             return user_input
         else:
@@ -35,13 +43,11 @@ def is_valid_password(password):
 def hash_password(password):
     # Encode le mot de passe en bytes
     password_bytes = password.encode('utf-8')
-    print(password_bytes)
     # Crée un objet sha256
     sha256 = hashlib.sha256()
     # Met à jour l'objet sha256 avec les bytes du mot de passe
     sha256.update(password_bytes)
     # Retourne le hachage en format hexadécimal
-    print(sha256.hexdigest())
     return sha256.hexdigest()
 
 def get_current_datetime():
@@ -68,7 +74,7 @@ def is_valid_phone_number(phone_number):
     \d{7} : suivi de 7 chiffres supplémentaires, formant ainsi un total de 8 chiffres pour le numéro spécifique
     $ : fin de la chaîne
     '''
-    pattern = r'^(\(\d{3}\)|\d{3})[-\s]?([2-5]\d{7})$'
+    pattern = r'^(\\(\d{3}\\)|\d{3})[-\s]?([2-5]\d{7})$'
     return re.match(pattern, phone_number) is not None
 
 def is_valid_email(email):
@@ -113,16 +119,16 @@ class Person:
         self.email = ''
     
     def f_name(self):
-        self.first_name = is_empty("Entrer votre prénom:\n(x pour quitter)\n--> ")
+        self.first_name = is_empty("Entrer votre prénom (x pour quitter):")
         return self.first_name
     
     def l_name(self):
-        self.last_name_name = is_empty("Entrer votre nom:\n(x pour quitter)\n--> ")
+        self.last_name_name = is_empty("Entrer votre nom (x pour quitter):")
         return self.last_name_name
 
     def mail(self):
         while True:
-            self.email = is_empty("Entrer votre adresse mail:\n(x pour quitter) \n-->")
+            self.email = is_empty("Entrer votre adresse mail (x pour quitter):")
             if self.email.lower() == 'x':
                 return False
                 break
@@ -130,15 +136,15 @@ class Person:
                 if is_valid_email(self.email):
                     return self.email
                 else:
-                    print("Votre email n'est pas valide. Veuillez reessayer.")
+                    print('\n',' '*20,"Votre email n'est pas valide. Veuillez reessayer.")
             
-
 def attendre_touche():
     """
     Attend que l'utilisateur appuie sur une touche pour continuer.
     """
     try:
-        input("Appuyez sur une touche pour continuer...")
+        print('\n',' '*20, "Appuyez sur ENTER pour continuer...")
+        input("\t\t\t\t")
     except KeyboardInterrupt:
         pass  # Gère l'interruption par Ctrl+C
 
@@ -153,7 +159,6 @@ def clear_screen():
     else:
         # Cas par défaut : tentative de clear pour d'autres systèmes
         os.system('cls' if os.name == 'nt' else 'clear')
-
 
 def verifier_format_heure_v1(heure):
     """
@@ -210,3 +215,36 @@ def verifier_plage_horaire(heure):
     #print(verifier_plage_horaire("16:01"))  # False
     #print(verifier_plage_horaire("25:00"))  # False (mauvais format)
 
+def afficher_entete(column_names):
+    # Détermination de la largeur des colonnes
+    colonne_width = [len(name) for name in column_names]
+    
+    # Création d'une ligne de séparation
+    separateur = '+' + '+'.join('-' * (width + 2) for width in colonne_width) + '+'
+    
+    # Affichage de l'entête de la table
+    header = '|' + '|'.join(f' {name:<{width}} ' for name, width in zip(column_names, colonne_width)) + '|'
+    print(' '*10,separateur)
+    print(' '*10,header)
+    print(' '*10,separateur)
+    
+    return colonne_width, separateur
+
+def afficher_donnees(data, colonne_width, separateur):
+    # Affichage des lignes de la table
+    for row in data:
+        line = '|' + '|'.join(f' {str(value):<{width}} ' for value, width in zip(row, colonne_width)) + '|'
+        print(' '*10,line)
+    print(' '*10,separateur)
+
+def afficher_texte_progressivement(texte, delai=0.06):
+    """
+    Affiche le texte progressivement caractère par caractère.
+    
+    :param texte: Le texte à afficher.
+    :param delai: Le délai en secondes entre chaque caractère (par défaut 0.1 seconde).
+    """
+    for caractere in texte:
+        print(caractere, end='', flush=True)
+        sleep(delai)
+    print()  # Pour passer à la ligne suivante après l'affichage complet du texte

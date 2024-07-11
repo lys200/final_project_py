@@ -163,7 +163,8 @@ class Gestion_Horaire:
         while True:
             print("Entrer la session pour laquelle vous enregistrer le cours dans l'horaire")
             session = is_empty("(x pour quitter)\n -->")
-            if session == '1' or session == '2':                
+            if session == '1' or session == '2':   
+                session = int(session)             
                 break
             else:
                 print("la session doit etre 1 ou 2")
@@ -172,144 +173,240 @@ class Gestion_Horaire:
         if  db.filter_table(self.connection_db, "Horaire", code_cours = cours, nom_cours = cours_datas[0][2], code_salle = salle, jour = jour, heure_debut = debut, heure_fin = heure_finale, session = session, annee = annee):
             print(f"Le cours {cours} est deja enregistré dans l'horaire pour la {session}e session de l'annee {annee}.")
         else:
-            if db.verifier_conflit(self.connection_db, jour, session, annee, debut, heure_finale):
+            if db.verifier_conflit(self.connection_db, jour, session, annee, debut, heure_finale, salle):
                 print(f"Il y a conflit entre l'horaire du cours {cours} et celle d'un autre cours, veuillez consulter l'horaire puis reassayer")
             else:
                 db.insert_data(self.connection_db, "Horaire", code_cours = cours, nom_cours = cours_datas[0][2], code_salle = salle, jour = jour, heure_debut = debut, heure_fin = heure_finale, session = session, annee = annee)
-
-
-            
-           
+  
     def lister(self):
         """Lister toutes les informations enregistreees dans l'horaire"""
         datas = db.read_database(self.connection_db, "Horaire")
         if datas:
-            print("\t\tVoici les cours programmés dans l'horaire:\n ")
-            placeholders = ['|indexes','|id','|nom' ,"|prenom" ,'|tel' ,'|email']
+            print("\n\t\t\t\tVoici les cours programmés dans l'horaire:\n ")
+
+            placeholders = ['|indexes','|code du cours','|nom du cours' ,"|code de la salle" ,'|jour' ,'|heure de début', '|heure de fin', '|session', '|année']
             display_list_columns(placeholders)
             for data in datas:
                 display_list_columns(data)
         else:
             print("\nAucun cours n'est encore enregistré dans l'horaire.\n")
 
-    def modifier(self):        
-        """Modifier les infos d'un Professeur"""
-        id_Professeur = is_empty("Entrer le id du Professeur a modifier: \n -->")
-        if db.verify_data(self.connection_db, "Professeurs", "id_prof", id_Professeur) :
-            while True:
-                print('\t','-'*8,"MENU MODIFIER PROFESSEUR",'-'*8)
-                print('\t','-'*32)
-                print("Veuillez choisir entre les parmi options de modification suivantes: ")
-                print("1- Modifier le nom du professeur.")
-                print("2- Modifier le prenom du professeur.")
-                print("3- Modifier le telephone du professeur")
-                print("4- Modifier l'email du professeur")
-                print("5- Retour au menu Professeur.")
-                print("6- Quitter le programme. ")
+    # def modifier(self):        
+    #     """Modifier les infos d'un Professeur"""
+    #     id_horaire = is_empty("Entrer le id de l'horaire a modifier: \n -->")
+    #     if db.verify_data(self.connection_db, "Horaire", "id", id_horaire) :
+    #         while True:
+    #             print('\t','-'*8,"MENU MODIFIER Horaire",'-'*8)
+    #             print('\t','-'*32)
+    #             print("Veuillez choisir parmi les options de modification suivantes: ")
+    #             print("1- Modifier la salle.")
+    #             print("2- Modifier le jour du cours.")
+    #             print("3- Modifier l'heure de debut du cours")
+    #             print("4- Modifier la session")
+    #             print("5- Modifier l'annee")
+    #             print("6- Retour au menu Horaire.")
+    #             print("7- Quitter le programme. ")
 
-                choix = is_empty("Faites votre choix:\n -->")
-                if choix == '1':
-                    nom = is_empty("Entrer le nouveau nom du professeur (x pour quitter): \n -->")
-                    if nom == 'x':
-                        return  
-                    else:
-                        db.update_data(self.connection_db, "Professeurs", "id_prof", id_Professeur,  nom_prof = nom) 
-                        print("Mise a jour effectuée")
+    #             choix = is_empty("Faites votre choix:\n -->")
+    #             if choix == '1':
+    #                 salle = is_empty("Entrer la nouvelle salle (x pour quitter): \n -->")
+    #                 if salle == 'x':
+    #                     return  
+    #                 else:
+    #                     db.update_data(self.connection_db, "Professeurs", "id_prof", id_Professeur,  nom_prof = nom) 
+    #                     print("Mise a jour effectuée")
 
-                elif choix == '2':
-                    prenom = is_empty("Entrer le nouveau prenom du professeur: (x pour quitter)\n -->")
-                    if prenom == 'x':
-                        return
-                    else:
-                        db.update_data(self.connection_db, "Professeurs", "id_prof", id_Professeur,  prenom_prof = prenom)
-                        print("Mise a jour effectuée")
+    #             elif choix == '2':
+    #                 prenom = is_empty("Entrer le nouveau prenom du professeur: (x pour quitter)\n -->")
+    #                 if prenom == 'x':
+    #                     return
+    #                 else:
+    #                     db.update_data(self.connection_db, "Professeurs", "id_prof", id_Professeur,  prenom_prof = prenom)
+    #                     print("Mise a jour effectuée")
 
-                elif choix == "3":
-                    while True:
-                        tel = is_empty("Entrer le nouveau telephone du prof: (x pour quitter)\n -->")
-                        if tel == 'x':
-                            return
-                        elif is_valid_phone_number(tel):
-                            db.update_data(self.connection_db, "Professeurs", "id_prof", id_Professeur,  tel_prof = tel)
-                            print("Mise a jour effectuée")
-                            break
-                        else:
-                            print("Telephone invalide. Exemple de formats valide:")
-                            print("(123) 456-7890")  # True
-                            print("123-456-7890")    # True
-                            print("123 456 7890")   # True
-                            print("1234567890")      # True
-                elif choix == '4':
-                    while True:
-                        email = is_empty("Entrer la npuvelle adresse mail du prof: \n -->")
-                        if email == 'x':
-                            return
-                        elif is_valid_email(email):
-                            db.update_data(self.connection_db, "Professeurs", "id_prof", id_Professeur,  email = email)
-                            print("Mise a jour effectuée")
-                            break
-                        else:
-                            print("Email invalide.\nExemple: something@domain.com")
-                elif choix == '5':
-                    break #or return
-                elif choix == '6':
-                    self.connection_db.close()
-                    exit()
-                else:
-                    print("Vous devez choisir un chiffre entre 1 a 6.")
-        else:
-            print("Ce professeur n'est pas enregistré dans la base de données.")
+    #             elif choix == "3":
+    #                 while True:
+    #                     tel = is_empty("Entrer le nouveau telephone du prof: (x pour quitter)\n -->")
+    #                     if tel == 'x':
+    #                         return
+    #                     elif is_valid_phone_number(tel):
+    #                         db.update_data(self.connection_db, "Professeurs", "id_prof", id_Professeur,  tel_prof = tel)
+    #                         print("Mise a jour effectuée")
+    #                         break
+    #                     else:
+    #                         print("Telephone invalide. Exemple de formats valide:")
+    #                         print("(123) 456-7890")  # True
+    #                         print("123-456-7890")    # True
+    #                         print("123 456 7890")   # True
+    #                         print("1234567890")      # True
+    #             elif choix == '4':
+    #                 while True:
+    #                     email = is_empty("Entrer la npuvelle adresse mail du prof: \n -->")
+    #                     if email == 'x':
+    #                         return
+    #                     elif is_valid_email(email):
+    #                         db.update_data(self.connection_db, "Professeurs", "id_prof", id_Professeur,  email = email)
+    #                         print("Mise a jour effectuée")
+    #                         break
+    #                     else:
+    #                         print("Email invalide.\nExemple: something@domain.com")
+    #             elif choix == '5':
+    #                 break #or return
+    #             elif choix == '6':
+    #                 self.connection_db.close()
+    #                 exit()
+    #             else:
+    #                 print("Vous devez choisir un chiffre entre 1 a 6.")
+    #     else:
+    #         print("Ce professeur n'est pas enregistré dans la base de données.")
 
     def rechercher(self):
         """filtrer la table Salles"""
         while True:
-            print('\t','-'*8,"MENU RECHERCHER PROFESSEUR",'-'*8)
+            print('\t','-'*8,"MENU FILTRER HORAIRE",'-'*8)
             print('\t','-'*32)
             print("Pour faire une recherche par filtre , vous devez choisir entre les parmi options suivantes: ")
-            print("1- Rechercher un professeur par son id.")
-            print("2- Retour au menu Professeur.")
-            print("3- Quitter le programme. ")
+            print("1- Rechercher une horaire par son id.")
+            print("2- Afficher les horaires d'une salle.")
+            print("3- Afficher les horaires d'un cours.")
+            print("4- Afficher les horaires d'une faculte.")
+            print("5- Afficher les horaires d'un batiment.")
+            print("6- Trier les horaires par niveau.")
+            print("7- Trier les horaires par session.")
+            print("8- Trier les horaires par année.")
+            print("9- retour au menu Horaire. ")
+            print("10- Quitter le programme. ")
             choix = is_empty("Faites votre choix: \n -->")
             
             if choix == '1':
-                prof = is_empty("Entrer l'id du professeur a afficher:\n --> ")
-                if db.verify_data(self.connection_db, "Professeurs", "id_prof", prof) == True:
-                    datas = db.search_by_data(self.connection_db, "Professeurs","id_prof", prof)
-                    placeholders = ['|indexes','|id','|nom' ,"|prenom" ,'|tel' ,'|email']
+                hor = is_empty("Entrer l'id de l'horaire a afficher:\n --> ")
+                if db.verify_data(self.connection_db, "Horaire", "id", hor):
+                    datas = db.search_by_data(self.connection_db, "Horaire","id", hor)
+                    placeholders = ['|indexes','|code du cours','|nom du cours' ,"|code de la salle" ,'|jour' ,'|heure de début', '|heure de fin', '|session', '|année']
                     display_list_columns(placeholders)
                     for data in datas:
                         display_list_columns(data)
                 else:
-                    print("Ce professeur n'est pas enregistré dans la base de données.")
-
+                    print("Cette horaire n'est pas enregistrée dans la base de données.")
+            
             elif choix == '2':
-                break
+                salle = is_empty("Entrer l'id de la salle dont vous voullez afficher l'horaire:\n --> ")
+                if db.verify_data(self.connection_db, "Horaire", "code_salle", salle):
+                    datas = db.search_by_data(self.connection_db, "Horaire","code_salle", salle)
+                    placeholders = ['|indexes','|code du cours','|nom du cours' ,"|code de la salle" ,'|jour' ,'|heure de début', '|heure de fin', '|session', '|année']
+                    display_list_columns(placeholders)
+                    for data in datas:
+                        display_list_columns(data)
+                else:
+                    print("Cette salle ne figure pas dans la table de l'horaire.")
 
             elif choix == '3':
+                cours = is_empty("Entrer l'id du cours dont vous voullez afficher l'horaire:\n --> ")
+                if db.verify_data(self.connection_db, "Horaire", "code_cours", cours):
+                    datas = db.search_by_data(self.connection_db, "Horaire","code_cours", cours)
+                    placeholders = ['|indexes','|code du cours','|nom du cours' ,"|code de la salle" ,'|jour' ,'|heure de début', '|heure de fin', '|session', '|année']
+                    display_list_columns(placeholders)
+                    for data in datas:
+                        display_list_columns(data)
+                else:
+                    print("Ce cours ne figure pas dans la table de l'horaire.")
+
+            elif choix == '4':
+                fac = is_empty("Entrer la fac dont vous voulez afficher les horaires:\n --> ")
+
+                datas = db.faire_jointure(self.connection_db, "Horaire", "cours", "code_cours", "id_cours", "Horaire.*", "cours.*", f"Cours.nom_fac = '{fac}'")
+                
+                if datas:
+                    for data in datas:
+                        display_list_columns(data)
+                else:
+                    print(f"Aucune horaire n'est enregistrée pour les cours de la fac {fac}")
+                # datas = db.search_by_data(self.connection_db, "Horaire","code_cours", salle)
+                # placeholders = ['|indexes','|code du cours','|nom du cours' ,"|code de la salle" ,'|jour' ,'|heure de début', '|heure de fin', '|session', '|année']
+                # display_list_columns(placeholders)
+                # for data in datas:
+                #     display_list_columns(data)
+
+            elif choix == '5':
+                bat = is_empty("Entrer l'id du cours dont vous voullez afficher l'horaire:\n --> ")
+                if db.verify_data(self.connection_db, "Batiment", "id_batiment", bat):
+                    datas = db.get_column_values_starting_with(self.connection_db, "Horaire", "code_salle", bat)
+                    if datas:
+                        placeholders = ['|indexes','|code du cours','|nom du cours' ,"|code de la salle" ,'|jour' ,'|heure de début', '|heure de fin', '|session', '|année']
+                        display_list_columns(placeholders)
+                        for data in datas:
+                            display_list_columns(data)
+                    else:
+                        print(f"aucune horaire n'est encore enregistré pour le batiment {bat}")
+                else:
+                    print("Ce batiment n'est pas encore enregistré.")
+ 
+            elif choix == '6':
+                niveau = is_empty("Entrer le niveau dont vous voullez afficher les horaires:\n --> ")
+                datas =  db.afficher_horaires(self.connection_db, niveau=niveau)
+                if datas:
+                    placeholders = ['|indexes','|code du cours','|nom du cours' ,"|code de la salle" ,'|jour' ,'|heure de début', '|heure de fin', '|session', '|année']
+                    display_list_columns(placeholders)
+                    for data in datas:
+                        display_list_columns(data)
+                else:
+                    print("Aucune horaire n'est enregistré pour ce niveau.")
+
+            elif choix == '7':
+                session = is_empty("Entrer la session [1-2]:\n --> ")
+                if session == '1' or session == '2':
+                    datas = db.search_by_data(self.connection_db, "Horaire","session", session)
+                    placeholders = ['|indexes','|code du cours','|nom du cours' ,"|code de la salle" ,'|jour' ,'|heure de début', '|heure de fin', '|session', '|année']
+                    display_list_columns(placeholders)
+                    for data in datas:
+                        display_list_columns(data)
+                else:
+                    print("La session doit etre 1 ou 2.")
+
+            elif choix == '8':
+                while True:
+                    try:
+                        annee = int(is_empty("Entrer l'annee: (x pour quitter)\n --> "))
+                    except ValueError: 
+                        print("l'annee doit etre un entier.")
+                    else: 
+                        datas = db.search_by_data(self.connection_db, "Horaire","annee", annee)
+                        if datas:
+                            placeholders = ['|indexes','|code du cours','|nom du cours' ,"|code de la salle" ,'|jour' ,'|heure de début', '|heure de fin', '|session', '|année']
+                            display_list_columns(placeholders)
+                            for data in datas:
+                                display_list_columns(data)
+                        else:
+                            print(f"Aucune horaire n'est enregistrée pour l'année {annee}.")
+                        break
+            elif choix == '9':
+                break
+
+            elif choix == '10':
                 exit()
 
             else:
                 print("Entrée invalide, Veuillez choisir entre les options proposées.")
 
     def supprimer(self):
-        """Supprime un professeur , et toutes ses occurences dans les autres tables."""
-        prof = is_empty("Entrer l'id du professeur a supprimer:(x pour quitter)\n --> ")
-        if prof == 'x':
+        """Supprime une horaire , et toutes ses occurences dans les autres tables."""
+        hor = is_empty("Entrer l'id de l'horaire a supprimer:(x pour quitter)\n --> ")
+        if hor == 'x':
             return
-        elif db.verify_data(self.connection_db, "Professeurs", "id_prof", prof):
+        elif db.verify_data(self.connection_db, "Horaire", "id", hor):
             while True: 
-                print(f"Etes-vous sur de vouloir supprimer le Professeur {prof}?")
+                print(f"Etes-vous sur de vouloir supprimer cette info de l'horaire?")
                 choix = is_empty("1- Supprimer 2- Annuler\n -->")
                 if choix == '1':
-                    db.delete_database(self.connection_db, "Professeurs", "id_prof", prof)
-                    print(f"Suppression du Professeur {prof} effectuée!")
+                    db.delete_database(self.connection_db, "Horaire", "id", hor)
+                    print(f"Suppression de l'horaire {hor} effectuée!")
                     break
                 elif choix == '2':
                     break
                 else:
                     print("Vous devez choisir entre les options 1 et 2.")
         else:
-            print("Ce Professeur n'est pas enregistré dans la base de données.")
+            print("Cette id d'horaire n'est pas enregistré dans la base de données.")
   
     def menu_horaire (self) :
         """Fonction affichant les options de gestion des Professeurs"""
@@ -323,7 +420,7 @@ class Gestion_Horaire:
             print("1- Enregistrer un cours dans l'horaire.")
             print("2- Afficher tous les horaires.")
             print("3- Rechercher une horaire.")
-            print("4- Modifier une information dans l'horaire.")
+            print("4- Modifier une information dans l'horaire.(to do)")
             print("5- Supprimer un cours de l'horaire.")
             print("6- Retour au menu principal.")
             print("7- Quitter le programme.")

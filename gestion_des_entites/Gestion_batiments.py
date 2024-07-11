@@ -1,5 +1,5 @@
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes import is_empty
+from gestion_des_contraintes.contraintes import is_empty, afficher_entete,afficher_donnees
 """   base = 'test3.db'
     conn = db.connect_to_database(base)
     db.initialize_db(conn)
@@ -22,8 +22,10 @@ class Gestion_Batiment:
     def enregistrer(self):
         """Enregistre un nouveau batiment"""
         while True:
-            id_bat = input("Entrer le nom du batiment[A-D]: ")
-            if id_bat in ['A', 'B', 'C', 'D']:
+            id_bat = input("Entrer le nom du batiment[A-D]:\n (x pour quitter) \n -->").upper()
+            if id_bat == 'X':
+                return
+            elif id_bat in ['A', 'B', 'C', 'D']:
                 break
             else: 
                 print("Le batiment doit etre A, B, C ou D.\n")
@@ -33,25 +35,27 @@ class Gestion_Batiment:
         if is_batiment:
             print("Ce batiment est déja enregistré.")
         else:
-            db.insert_data(self.curseur, "Batiments", id_batiment = id_bat, nombre_etages = 3, salle_de_cours = 18, salle_de_cours_disponibles = 18)
+            db.insert_data(self.curseur, "Batiments", id_batiment = id_bat, nombre_etages = 3, salle_de_cours = 0)
             print("Par défaut, le nombre d'étages est fixé à 3 et le nombre de salle par étage à 6.")
             print(f"Le Batiment {id_bat} est enregistré aves succès.\n")
             
     def lister(self):
         """Lister toutes les lignes de la table Batiments"""
         datas = db.read_database(self.curseur, "Batiments")
-        if datas == []:
-            print("Aucun batiment n'est encore enregistré.")
-        else:
+        if datas:
             print("Voici les informations enregistrées concernant les batiments:\n ")
-            print("indexes|batiments|étages|salles|salles disponibles|")
-            for data in datas:
-                print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4])
+            columns= ['index','batiments','étages','salles']
+            largeur, separateur = afficher_entete(columns)
+            afficher_donnees(datas, largeur, separateur)
+        else:
+            print("Aucun batiment n'est encore enregistré.")
 
     def modifier(self):        
         """Modifie les infos d'un batiment"""
-        name = is_empty("Entrer le nom/id du batiments a modifier:\n --> ")
-        if db.verify_data(self.curseur, "Batiments", "id_batiment", name) == True:
+        name = is_empty("Entrer le nom/id du batiments a modifier:\n(x pour quitter) --> ")
+        if name == 'x':
+            return
+        elif db.verify_data(self.curseur, "Batiments", "id_batiment", name) == True:
             champs = input("Entrer le champs a modifier [id_Batiment]: ")
             if db.verify_column(self.curseur, "Batiments", champs) == True:
                 new_data = is_empty(f"Entrer la nouvelle valeur du champ {champs},[A-B-C-D]:\n -->")
@@ -77,16 +81,16 @@ class Gestion_Batiment:
             print("1- Rechercher par id_batiment")
             print("2- Afficher les salles d'un batiment")
             print("3- Rechercher par nombre de salle")
-            print("4- Rechercher par Nombre d'étage")
-            print("5- Retour au menu batiment.")
+            print("4- Retour au menu batiment.")
+            print("5- Quitter le programme.")
             choix = input("Faites votre choix: ")
             if choix == '1':
                 id_batiment = is_empty("Entrer l'id du Batiment a afficher: \n --> ")
                 if db.verify_data(self.curseur, "Batiments", "id_batiment", id_batiment) == True:
                     datas = db.search_by_data(self.curseur, "Batiments","id_batiment", id_batiment)
-                    print("indexes|batiments|étages|salles| salles disponibles")
-                    for data in datas:
-                        print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t|", data[4])
+                    columns= ['index','batiments','étages','salles']
+                    largeur, separateur = afficher_entete(columns)
+                    afficher_donnees(datas, largeur, separateur)
                 else:
                     print("Ce batiment n'est pas enregistré dans la base de données.")
             elif choix == '2':
@@ -100,7 +104,7 @@ class Gestion_Batiment:
                         for data in datas:
                             print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4], "\t", data[5],"\t", data[6])
                 else:
-                    print("Ce batiment n'est pas enregistré dans la base de donnée.")
+                    print("Aucune salle trouvée.")
             elif choix == 3:
                 nbre_salle = input("Entrer le nombre de salle: ")
                 datas = db.search_by_data(self.curseur, "Batiments","salle_de_cours", nbre_salle)
@@ -163,10 +167,10 @@ class Gestion_Batiment:
             print('\t','-'*32)
             print("Bienvenue au menu Batiments.")
             print("Veuillez choisir votre option.")
-            print("1- Enregistrer un batiment.")
+            print("1- Enregistrer un batiment.[admin only]")
             print("2- Lister les batiments.")
             print("3- Rechercher les information d'un batiment.")
-            print("4- Supprimer un batiment.")
+            print("4- Supprimer un batiment.[admin only]")
             print("5- Retour au menu principal.")
             print("6-Quitter le programme.")
             try:

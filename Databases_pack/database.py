@@ -18,8 +18,8 @@ def initialize_conn(conn):
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_batiment TEXT, 
                 nombre_etages INTEGER,
-                salle_de_cours INTEGER,
-                salle_de_cours_disponibles INTEGER)
+                salle_de_cours INTEGER
+                )
             """)
 
         #creation de la table Salle
@@ -30,8 +30,8 @@ def initialize_conn(conn):
                 num_salle INTEGER NOT NULL,
                 id_batiment TEXT,
                 etage INTEGER NOT NULL,
-                nombre_de_siege INTEGER NOT NULL, 
-                statut TEXT NOT NULL)
+                nombre_de_siege INTEGER NOT NULL
+                )
         """ )
 
         #creation de declencheurs pour generer les id composés
@@ -174,7 +174,7 @@ def insert_data(conn, table_name, **kwargs):
         print(f"Erreur d'integrite dans la table {table_name}:", e)
         #print("veuillez verifier que cette id se trouve deja dans la table , puis reesayer ")
     else:
-        print("Insertion réussie!!!")
+        print('\n',' '*20,"Insertion réussie!!!")
 
 def read_database(conn, table_name):
 #cette fonction prend en param la table en question et la base de donnee
@@ -207,14 +207,10 @@ def update_data(conn, table_name,  id_entite, id_value,**kwargs):
     curseur = conn.cursor()
     # Préparer les colonnes et les valeurs pour la mise à jour
     columns = ', '.join(f'{key} = ?' for key in kwargs)
-    print("cols =", columns)
-    #values = tuple(kwargs.values())
     values = tuple(kwargs.values()) + (id_value,)
     print("vas =", values)
     # Préparer la requête de mise à jour
     query = f'UPDATE {table_name} SET {columns} WHERE {id_entite} = ?'
-    print("query=", query)
-    print(id_value)
     # Exécuter la requête avec les valeurs fournies
     curseur.execute(query, values)
     conn.commit()
@@ -292,18 +288,19 @@ def filter_table(conn, table_name, **args):
         query = f"SELECT * FROM {table_name}"
         curseur.execute(query)
         return curseur.fetchall()
-
+ 
     where_clause = " AND ".join([f"{col} = ?" for col in args.keys()])
     query = f"SELECT * FROM {table_name} WHERE {where_clause}"
     curseur.execute(query, tuple(args.values()))
     datas = curseur.fetchall()
     return datas
 
-def verifier_conflit(conn, jour,session, annee, heure_debut, heure_fin):
+def verifier_conflit(conn, jour,session, annee, heure_debut, heure_fin, salle):
     """
     Vérifie si un cours existe déjà dans l'intervalle de temps donné.
     """
     """
+    :param salle: salle ou devrait se derouler le cours (e.g., 'C204')
     :param jour: Jour du cours (e.g., 'lundi')
     :param heure_debut: Heure de début du cours (e.g., '10:00')
     :param heure_fin: Heure de fin du cours (e.g., '12:00')
@@ -312,10 +309,13 @@ def verifier_conflit(conn, jour,session, annee, heure_debut, heure_fin):
     :return: True si un conflit est détecté, False sinon
     """
     curseur = conn.cursor()
-
+    #si un cours se deroule dans cette salle , durant cette meme session de la meme annee
+    # dans l'intervalle des heures qui coindcident , il y a conflit
+    # e.g: bio en C203 session 2 anneee 2023 a 12h-13h et physique en c203 session 2 annee 2023 a 12h-13h
     query = '''
     SELECT 1 FROM Horaire
-    WHERE jour = ?
+    WHERE code_salle = ?
+    AND jour = ?
     AND session = ?
     AND annee = ?
     AND (
@@ -324,6 +324,85 @@ def verifier_conflit(conn, jour,session, annee, heure_debut, heure_fin):
         OR (heure_debut >= ? AND heure_fin <= ?)
     )
     '''
-    curseur.execute(query, (jour, session, annee, heure_fin, heure_debut, heure_debut, heure_fin, heure_debut, heure_fin))
+
+    curseur.execute(query, (salle, jour, session, annee, heure_fin, heure_debut, heure_debut, heure_fin, heure_debut, heure_fin))
     return curseur.fetchone() is not None
 
+def faire_jointure1(conn, table1, table2, colonne_table1, colonne_table2, colonne_afficher1, colonne_afficher2, condition):
+
+    try:
+        cursor = conn.cursor()
+        query = f'''
+        SELECT *
+        FROM {table1}
+        JOIN {table2} ON {table1}.{colonne_table1} = {table2}.{colonne_table2}
+        WHERE {condition}
+        '''
+        # query= '''SELECT * from Cours JOIN Horaire ON id_cours = code_cours'''
+        print(query)
+        cursor.execute(query)
+        return cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Erreur: {e}")
+        return None
+    
+def faire_jointure(conn, table1, table2, colonne_table1, colonne_table2, colonne_afficher1, colonne_afficher2, condition):
+    try:
+        cursor = conn.cursor()
+        query = f'''
+        SELECT {colonne_afficher1}
+        FROM {table1}
+        JOIN {table2} ON {table1}.{colonne_table1} = {table2}.{colonne_table2}
+        WHERE {condition}
+        '''
+        print(query)
+        cursor.execute(query)
+        return cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"Erreur: {e}")
+        return None
+def get_column_values_starting_with(conn, table, column, starting_letter):
+    try:
+        cursor = conn.cursor()
+        query = f'''
+        SELECT {column}
+        FROM {table}
+        WHERE {column} LIKE ?
+        '''
+        cursor.execute(query, (f'{starting_letter}%',))
+        return cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
+        return None
+    
+
+
+def afficher_horaires(conn, faculte=None, niveau=None, id_prof=None):
+    # Connexion à la base de données
+    cursor = conn.cursor()
+    
+    # Construire la requête SQL
+    query = f"""
+    SELECT Horaire.*
+    FROM Horaire
+    JOIN Cours ON Horaire.code_cours = Cours.id_cours
+    WHERE 1=1
+    """
+    
+    # Ajouter les conditions en fonction des paramètres donnés
+    params = []
+    if faculte:
+        query += " AND Cours.nom_fac = ?"
+        params.append(faculte)
+    if niveau:
+        query += " AND Cours.niveau = ?"
+        params.append(niveau)
+    if id_prof:
+        query += " AND Cours.id_prof = ?"
+        params.append(id_prof)
+    
+    # Exécuter la requête et récupérer les résultats
+    cursor.execute(query, params)
+    return cursor.fetchall()
+    
+    

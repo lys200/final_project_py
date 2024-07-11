@@ -19,30 +19,44 @@ class Gestion_Salle:
         
     def enregistrer(self):
         """Enregistre une nouvelle salle"""
-        while True:
-            numero_salle = is_empty("Entrer le numero de la salle[1-6]:\n --> ")
-            if numero_salle in ['1', '2', '3', '4', '5','6']:
-                break
-            else: 
-                print("Le numéro de la salle doit etre compris entre 1 et 6.\n")
+        # while True:
+        #     numero_salle = is_empty("Entrer le numero de la salle[1-6]:\n --> ")
+        #     if numero_salle in ['1', '2', '3', '4', '5','6']:
+        #         break
+        #     else: 
+        #         print("Le numéro de la salle doit etre compris entre 1 et 6.\n")
 
         while True: 
-            batiment = is_empty("Entrer le nom/id du batiment dans lequel se trouve la salle:\n --> ")
+            print("Entrer le nom/id du batiment dans lequel se trouve la salle:")
+            batiment = is_empty("(x pour quitter)\n --> ")
+            if batiment == 'x':
+                return
             #verifier que le id_batiment n'exsite pas deja dans la table Batiment
             is_batiment = db.search_by_data(self.curseur, "batiments", "id_batiment", batiment)
             #insertion des donnees dans la table batiments
             if is_batiment:
                 while True:
-                    num_etage = is_empty("Entrer le numéro d'étage dans lequel se trouve la salle:[0-2]\n --> ")
-                    if int(num_etage) < 0 or int(num_etage) > (is_batiment[0][2]- 1):
-                        print(f"Le numéro d'étage doit etre entre 0 pour le rez-de-chaussée et {is_batiment[0][2] -1}, pour le dernier étage.")
+                    num_etage = is_empty("Entrer le numéro d'étage dans lequel se trouve la salle:[1-3]\n --> ")
+                    if int(num_etage) < 1 or int(num_etage) > 3:
+                        print(f"Le numéro d'étage doit etre entre 1 pour le rez-de-chaussée et 3 pour le dernier étage.")
                     else:
+                        while True:
+                            print(f"voici les numeros de salle pour cette étage:")
+                            numero_salles =  [f'{num_etage}01' ,f'{num_etage}02', f'{num_etage}03', f'{num_etage}04', f'{num_etage}05', f'{num_etage}06'] 
+                            print(f'{num_etage}01' ,f'{num_etage}02', f'{num_etage}03', f'{num_etage}04', f'{num_etage}05', f'{num_etage}06')
+                            numero_salle = is_empty("Choisir le numero de la salle[1-6]:\n(x pour quitter) --> ")
+                            if numero_salle == 'x':
+                                return
+                            elif numero_salle in numero_salles:
+                                break
+                            else: 
+                                print("Le numéro de la salle doit etre dans la liste proposée.\n")
                         break
-                print(f"verification de l'existence de la salle {batiment}{num_etage}0{numero_salle}...")
-                idsalle = f'{batiment}{num_etage}0{numero_salle}'
+                print(f"verification de l'existence de la salle {batiment}{numero_salle}...")
+                idsalle = f'{batiment}{numero_salle}'
                 print(idsalle)
                 if db.verify_data(self.curseur,'Salles','id_salle', idsalle):
-                    print("Cette salle a déeja été enregistrée dans la base de donnée.")
+                    print("Cette salle est deja enregistrée dans la base de donnée.")
                     break
                 else:
                     while True:
@@ -154,7 +168,7 @@ class Gestion_Salle:
             elif choix == '4':
                 id_batiment = is_empty("Entrer l'id du batiment dont vous voulez afficher les salles:\n -->")
                 if db.verify_data(self.curseur, "Salles","id_batiment", id_batiment):
-                    datas = db.search_by_data(self.curseur, "Salles", "id_batiment", id_batiment)
+                    datas = db.search_by_data(self.curseur, "Batiment", "id_batiment", id_batiment)
                     if datas:
                         print(f"Voici les informations des salles se trouvant au batiment {id_batiment}.\n")
                         print("_"*42)
