@@ -1,5 +1,5 @@
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes import is_empty, is_valid_email, is_valid_phone_number, display_list_columns, Person
+from gestion_des_contraintes.contraintes import is_empty, is_valid_email, is_valid_phone_number, display_list_columns, Person, afficher_texte_progressivement
 '''id INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_prof TEXT PRYMARY KEY, 
                 nom_prof TEXT NOT NULL,
@@ -11,10 +11,10 @@ class Gestion_Professeur:
     """Class contenant toutes les fonctions relative a la gestion des Salles"""
     
     def __init__(self, adm_id):
-        self.curseur = db.connect_to_database("Gestion_des_salles.db")
+        self.connection = db.connect_to_database("Gestion_des_salles.db")
         self.adm_id = adm_id
         self.personne = Person()
-        db.initialize_conn(self.curseur)
+        db.initialize_conn(self.connection)
         
     def enregistrer(self):
         """Enregistre un nouveau professeur"""
@@ -28,12 +28,12 @@ class Gestion_Professeur:
         if not email:
             return
         while True:
-            tel = is_empty("Entrer le telephone du prof: (x pour quitter)\n -->")
+            tel = is_empty("Entrer le telephone du prof: (x pour quitter)")
             if tel == 'x':
                 return
             elif is_valid_phone_number(tel):
-                db.insert_data(self.curseur, "Professeurs", nom_prof = nom, prenom_prof = prenom, tel_prof = tel, email = email)
-                print(f"Le professeur {nom} {prenom} est enregistré avec succès.")
+                db.insert_data(self.connection, "Professeurs", nom_prof = nom, prenom_prof = prenom, tel_prof = tel, email = email)
+                print(' '*20,"Le professeur {nom} {prenom} est enregistré avec succès.")
                 break
             else:
                 print("Telephone invalide. Exemple de formats valide:")
@@ -44,7 +44,7 @@ class Gestion_Professeur:
            
     def lister(self):
         """Lister toutes les salles de la table Professeurs"""
-        datas = db.read_database(self.curseur, "Professeurs")
+        datas = db.read_database(self.connection, "Professeurs")
         if datas:
             print("Voici les informations enregistrées concernant les Professeurs:\n ")
             placeholders = ['|indexes','|id','|nom' ,"|prenom" ,'|tel' ,'|email']
@@ -56,8 +56,8 @@ class Gestion_Professeur:
 
     def modifier(self):        
         """Modifier les infos d'un Professeur"""
-        id_Professeur = is_empty("Entrer le id du Professeur a modifier: \n -->")
-        if db.verify_data(self.curseur, "Professeurs", "id_prof", id_Professeur) :
+        id_Professeur = is_empty("Entrer le id du Professeur a modifier: ")
+        if db.verify_data(self.connection, "Professeurs", "id_prof", id_Professeur) :
             while True:
                 print('\t','-'*8,"MENU MODIFIER PROFESSEUR",'-'*8)
                 print('\t','-'*32)
@@ -69,13 +69,13 @@ class Gestion_Professeur:
                 print("5- Retour au menu Professeur.")
                 print("6- Quitter le programme. ")
 
-                choix = is_empty("Faites votre choix:\n -->")
+                choix = is_empty("Faites votre choix:")
                 if choix == '1':
                     nom = self.personne.l_name()
                     if nom.lower() == 'x':
                         return  
                     else:
-                        db.update_data(self.curseur, "Professeurs", "id_prof", id_Professeur,  nom_prof = nom) 
+                        db.update_data(self.connection, "Professeurs", "id_prof", id_Professeur,  nom_prof = nom) 
                         print("Mise a jour effectuée")
 
                 elif choix == '2':
@@ -83,16 +83,16 @@ class Gestion_Professeur:
                     if prenom.lower() == 'x':
                         return
                     else:
-                        db.update_data(self.curseur, "Professeurs", "id_prof", id_Professeur,  prenom_prof = prenom)
+                        db.update_data(self.connection, "Professeurs", "id_prof", id_Professeur,  prenom_prof = prenom)
                         print("Mise a jour effectuée")
 
                 elif choix == "3":
                     while True:
-                        tel = is_empty("Entrer le nouveau telephone du prof: (x pour quitter)\n -->")
+                        tel = is_empty("Entrer le nouveau telephone du prof: (x pour quitter)")
                         if tel == 'x':
                             return
                         elif is_valid_phone_number(tel):
-                            db.update_data(self.curseur, "Professeurs", "id_prof", id_Professeur,  tel_prof = tel)
+                            db.update_data(self.connection, "Professeurs", "id_prof", id_Professeur,  tel_prof = tel)
                             print("Mise a jour effectuée")
                             break
                         else:
@@ -107,7 +107,7 @@ class Gestion_Professeur:
                         if email.lower() == 'x':
                             return
                         elif is_valid_email(email):
-                            db.update_data(self.curseur, "Professeurs", "id_prof", id_Professeur,  email = email)
+                            db.update_data(self.connection, "Professeurs", "id_prof", id_Professeur,  email = email)
                             print("Mise a jour effectuée")
                             break
                         else:
@@ -130,12 +130,12 @@ class Gestion_Professeur:
             print("1- Rechercher un professeur par son id.")
             print("2- Retour au menu Professeur.")
             print("3- Quitter le programme. ")
-            choix = is_empty("Faites votre choix: \n -->")
+            choix = is_empty("Faites votre choix: ")
             
             if choix == '1':
-                prof = is_empty("Entrer l'id du professeur a afficher:\n --> ")
-                if db.verify_data(self.curseur, "Professeurs", "id_prof", prof) == True:
-                    datas = db.search_by_data(self.curseur, "Professeurs","id_prof", prof)
+                prof = is_empty("Entrer l'id du professeur a afficher: ")
+                if db.verify_data(self.connection, "Professeurs", "id_prof", prof) == True:
+                    datas = db.search_by_data(self.connection, "Professeurs","id_prof", prof)
                     placeholders = ['|indexes','|id','|nom' ,"|prenom" ,'|tel' ,'|email']
                     display_list_columns(placeholders)
                     for data in datas:
@@ -154,16 +154,39 @@ class Gestion_Professeur:
 
     def supprimer(self):
         """Supprime un professeur , et toutes ses occurences dans les autres tables."""
-        prof = is_empty("Entrer l'id du professeur a supprimer:(x pour quitter)\n --> ")
+        prof = is_empty("Entrer l'id du professeur a supprimer:(x pour quitter) ")
         if prof == 'x':
             return
-        elif db.verify_data(self.curseur, "Professeurs", "id_prof", prof):
+        elif db.verify_data(self.connection, "Professeurs", "id_prof", prof):
             while True: 
-                print(f"Etes-vous sur de vouloir supprimer le Professeur {prof}?")
-                choix = is_empty("1- Supprimer 2- Annuler\n -->")
+                Warning_= f"\t\t\t\tATTENTION!\n"
+                Warning_1 = f"\tLa supression du {prof} va entrainer la supression de toutes les horaires pour les cours que dispensait le professeur."
+                Warning_2 = "\t\tCar un cours ne peut pas etre dispensé sans professeur.\n"
+                print(Warning_)
+                afficher_texte_progressivement(Warning_1, 0.01)
+                afficher_texte_progressivement(Warning_2, 0.01)
+                print(' '*20,"Etes-vous sur de vouloir supprimer le Professeur {prof}?")
+                choix = is_empty("1- Supprimer 2- Annuler")
                 if choix == '1':
-                    db.delete_database(self.curseur, "Professeurs", "id_prof", prof)
-                    print(f"Suppression du Professeur {prof} effectuée!")
+                    # recuperation  des cours dispense par le prof
+                    cours = db.search_by_data(self.connection, "Cours", "id_prof", prof)
+                    # recuperer les id de ces cours
+                    horaire_to_delete = []
+                    for crs in cours:
+                        horaire_to_delete.append(crs[1])
+                        # supprimer l'id du prof dans les donnees du cours
+                        db.update_data(self.connection, "Cours", "id_cours", crs[1], id_prof = "----" )
+                    print(horaire_to_delete)
+                    
+                    # supprimer les horaires de ces cours
+                    
+                    for id_ in horaire_to_delete:
+                        print(' '*20, f"Suppression des horaires associées au cours: {id_}.")
+                        db.delete_database(self.connection, "Horaire", "code_cours", id_)
+
+
+                    db.delete_database(self.connection, "Professeurs", "id_prof", prof)
+                    print(' '*20,f"Suppression du Professeur {prof} effectuée!")
                     break
                 elif choix == '2':
                     break

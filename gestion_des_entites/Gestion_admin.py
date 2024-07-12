@@ -20,6 +20,8 @@ class Gestion_admin(Person):
             if mdp == 'x':
                 return
             elif hash_password(mdp) == is_adm[0][4]:
+                print(' '*30,"Connexion reussie!")
+                print(' '*20,f"Bienvenue {is_adm[0][2]} {is_adm[0][3]}!")
                 return id_adm
             else:
                 print('\n',' '*20,"Mot de passe incorrect")

@@ -46,7 +46,7 @@ def initialize_conn(conn):
             FOR EACH ROW
             BEGIN
                 UPDATE Salles
-                SET id_salle = NEW.id_batiment || etage || "0" || num_salle
+                SET id_salle = NEW.id_batiment || num_salle
                 where id = NEW.id;
             END;
         ''')
@@ -208,29 +208,21 @@ def update_data(conn, table_name,  id_entite, id_value,**kwargs):
     # Préparer les colonnes et les valeurs pour la mise à jour
     columns = ', '.join(f'{key} = ?' for key in kwargs)
     values = tuple(kwargs.values()) + (id_value,)
-    print("vas =", values)
     # Préparer la requête de mise à jour
     query = f'UPDATE {table_name} SET {columns} WHERE {id_entite} = ?'
     # Exécuter la requête avec les valeurs fournies
     curseur.execute(query, values)
     conn.commit()
-    print("Modification effectuée!\n")
-
+    
 def delete_database(conn, table_name, id_name, id_value):
     """fonction pour supprimmer n'inporte quelle info de n'inporte quelle table"""
     #prend en parametres: la conn, le nom de la table, le nom de la cle primaire, 
     #la valeur de l'id a supprimer
     curseur = conn.cursor()
-    print(table_name)
-    print(id_name)
-    print(id_value)
-
-    query = f"DELETE FROM {table_name} WHERE {id_name} = ?"
-    print(query, id_value)
-    
+    query = f"DELETE FROM {table_name} WHERE {id_name} = ?"    
     curseur.execute(query,  (id_value,))
     conn.commit()
-
+    
 def verify_data(conn, table_name, column_name, valeur):
     """
     Vérifie si une information est deja enregistree dans la table ou l'on veut faire l'insertion.
@@ -406,3 +398,49 @@ def afficher_horaires(conn, faculte=None, niveau=None, id_prof=None):
     return cursor.fetchall()
     
     
+def afficher_horaire(conn):
+    # Extraction des données
+    cursor = conn.execute("SELECT * FROM horaire ORDER BY annee, session, niveau, faculte")
+    rows = cursor.fetchall()
+    
+    jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
+    heures = [f'{h:02}:00' for h in range(8, 17)]
+    column_width = 15
+    
+    # Organisation des données par année, session, niveau, et faculté
+    horaires = {}
+    for row in rows:
+        annee, session, niveau, faculte, jour, heure_debut, heure_fin, cours = row[5], row[6], row[7], row[8], row[1], row[2], row[3], row[4]
+        
+        if annee not in horaires:
+            horaires[annee] = {}
+        if session not in horaires[annee]:
+            horaires[annee][session] = {}
+        if niveau not in horaires[annee][session]:
+            horaires[annee][session][niveau] = {}
+        if faculte not in horaires[annee][session][niveau]:
+            horaires[annee][session][niveau][faculte] = {heure: {jour: '' for jour in jours} for heure in heures}
+        
+        heure_debut_int = int(heure_debut.split(':')[0])
+        heure_fin_int = int(heure_fin.split(':')[0])
+        
+        for heure in range(heure_debut_int, heure_fin_int + 1):
+            heure_str = f'{heure:02}:00'
+            if heure_str in horaires[annee][session][niveau][faculte] and jour in horaires[annee][session][niveau][faculte][heure_str]:
+                if heure == heure_debut_int:
+                    horaires[annee][session][niveau][faculte][heure_str][jour] = cours
+                else:
+                    horaires[annee][session][niveau][faculte][heure_str][jour] = '.' * (column_width - 1)
+    
+    # Affichage de l'horaire
+    for annee, sessions in horaires.items():
+        for session, niveaux in sessions.items():
+            for niveau, facultes in niveaux.items():
+                for faculte, horaire in facultes.items():
+                    print(f"Horaire {session} {annee} - Niveau {niveau}, Faculté de {faculte}:")
+                    # afficher_entete(['Heure'] + [jour.capitalize() for jour in jours], column_width)
+                    for heure in heures:
+                        row = f"| {heure:<{column_width}} | " + ' | '.join(f"{horaire[heure][jour]:<{column_width}}" for jour in jours) + " |"
+                        print(' ' * 15 + row)
+                    print(' ' * 15 + '+' + '+'.join('-' * (column_width + 2) for _ in jours) + '+')
+                    print('\n' + '-'*80 + '\n')

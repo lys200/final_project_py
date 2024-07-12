@@ -81,3 +81,20 @@ donnees = [
 column_widths, separator = afficher_entete(entete)
 afficher_donnees(donnees, column_widths, separator)
 
+def modifier(self):        
+        """Modifie les infos d'un batiment"""
+        name = is_empty("Entrer le nom/id du batiments a modifier (x pour quitter):").upper()
+        if name == 'X':
+            return
+        elif db.verify_data(self.curseur, "Batiments", "id_batiment", name) == True:
+            champs = is_empty("Entrer le champs a modifier [id_Batiment]: ")
+            if db.verify_column(self.curseur, "Batiments", champs) == True:
+                new_data = is_empty(f"Entrer la nouvelle valeur du champ {champs},[A-B-C-D]:")
+                if new_data :
+                    db.update_data(self.curseur, "Batiments", name, id_batiment = new_data)
+                else:
+                    print(' '*20,"Id batiment invalide")
+            else:
+                print(' '*20,f"la colonne {champs} n'ext pas dans la table Batiments.")
+        else:
+            print(' '*20,"Ce batiment n'est pas enregistré dans la base de données.")

@@ -14,18 +14,22 @@ def banner():
     print(" " * 10,"| " + phrase + " |")
     print(" " * 10,"+" + "-" * (longueur_phrase + 2) + "+")
     print("\n\n")
+
 def is_empty(input_message):
     """Verifie que le champs rempli par le user n'est pas vide."""
     while True:
-        print('\n',' '*20,input_message)
+        print(' '*20,input_message)
         user_input = input("                    -->").strip()
         if user_input:
             return user_input
         else:
-            print("L'entrée ne peut pas être vide ou ne contenir que des espaces. Veuillez réessayer.")
+            print(' '*20,"L'entrée ne peut pas être vide ou ne contenir que des espaces. Veuillez réessayer.")
             
 def is_integer(number):
-    return isinstance(number, int)
+    try:
+        return isinstance(int(number), int)
+    except Exception as e:
+        return False
 
 def is_valid_password(password):
     """Verifie si le mot de passe a au moins une majuscule, un chiffre et un caractere special. """
@@ -224,9 +228,9 @@ def afficher_entete(column_names):
     
     # Affichage de l'entête de la table
     header = '|' + '|'.join(f' {name:<{width}} ' for name, width in zip(column_names, colonne_width)) + '|'
-    print(' '*10,separateur)
-    print(' '*10,header)
-    print(' '*10,separateur)
+    print(' '*15,separateur)
+    print(' '*15,header)
+    print(' '*15,separateur)
     
     return colonne_width, separateur
 
@@ -234,8 +238,8 @@ def afficher_donnees(data, colonne_width, separateur):
     # Affichage des lignes de la table
     for row in data:
         line = '|' + '|'.join(f' {str(value):<{width}} ' for value, width in zip(row, colonne_width)) + '|'
-        print(' '*10,line)
-    print(' '*10,separateur)
+        print(' '*15,line)
+    print(' '*15,separateur)
 
 def afficher_texte_progressivement(texte, delai=0.06):
     """
@@ -244,7 +248,9 @@ def afficher_texte_progressivement(texte, delai=0.06):
     :param texte: Le texte à afficher.
     :param delai: Le délai en secondes entre chaque caractère (par défaut 0.1 seconde).
     """
+    # texte2 = f'{' '*20,}'+ texte
     for caractere in texte:
         print(caractere, end='', flush=True)
         sleep(delai)
     print()  # Pour passer à la ligne suivante après l'affichage complet du texte
+

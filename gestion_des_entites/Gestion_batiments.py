@@ -1,5 +1,5 @@
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes import is_empty, afficher_entete,afficher_donnees
+from gestion_des_contraintes.contraintes import afficher_texte_progressivement, is_integer, attendre_touche, clear_screen,banner,is_empty, afficher_entete,afficher_donnees
 """   base = 'test3.db'
     conn = db.connect_to_database(base)
     db.initialize_db(conn)
@@ -22,116 +22,117 @@ class Gestion_Batiment:
     def enregistrer(self):
         """Enregistre un nouveau batiment"""
         while True:
-            id_bat = input("Entrer le nom du batiment[A-D]:\n (x pour quitter) \n -->").upper()
+            print(' '*20,"Entrer le nom du batiment[A-D]:")
+            id_bat = is_empty("(x pour quitter)").upper()
             if id_bat == 'X':
                 return
             elif id_bat in ['A', 'B', 'C', 'D']:
                 break
             else: 
-                print("Le batiment doit etre A, B, C ou D.\n")
+                print(' '*20,"Le batiment doit etre A, B, C ou D.\n")
         #verifier que le id_batiment n'exsite pas deja dans la table Batiment
         is_batiment = db.search_by_data(self.curseur, "batiments", "id_batiment", id_bat)
         #insertion des donnees dans la table batiments
         if is_batiment:
-            print("Ce batiment est déja enregistré.")
+            print(' '*20,"Ce batiment est déja enregistré.")
         else:
             db.insert_data(self.curseur, "Batiments", id_batiment = id_bat, nombre_etages = 3, salle_de_cours = 0)
-            print("Par défaut, le nombre d'étages est fixé à 3 et le nombre de salle par étage à 6.")
-            print(f"Le Batiment {id_bat} est enregistré aves succès.\n")
+            print(' '*20,"Par défaut, le nombre d'étages est fixé à 3 et le nombre de salle à 0.")
+            print(' '*20,"Veuillez passer au menu salle pour enregistrer des salles dans le batiment de votre choix")
+            print(' '*20,f"Le Batiment {id_bat} est enregistré aves succès.\n")
             
     def lister(self):
         """Lister toutes les lignes de la table Batiments"""
         datas = db.read_database(self.curseur, "Batiments")
         if datas:
-            print("Voici les informations enregistrées concernant les batiments:\n ")
+            print(' '*20,"Voici les informations enregistrées concernant les batiments:\n ")
             columns= ['index','batiments','étages','salles']
             largeur, separateur = afficher_entete(columns)
             afficher_donnees(datas, largeur, separateur)
         else:
-            print("Aucun batiment n'est encore enregistré.")
-
-    def modifier(self):        
-        """Modifie les infos d'un batiment"""
-        name = is_empty("Entrer le nom/id du batiments a modifier:\n(x pour quitter) --> ")
-        if name == 'x':
-            return
-        elif db.verify_data(self.curseur, "Batiments", "id_batiment", name) == True:
-            champs = input("Entrer le champs a modifier [id_Batiment]: ")
-            if db.verify_column(self.curseur, "Batiments", champs) == True:
-                new_data = is_empty(f"Entrer la nouvelle valeur du champ {champs},[A-B-C-D]:\n -->")
-                if new_data :#in ['A','B','C','D']:
-                    #db.update_data(self.curseur,"Batiments" ,'A', nombre_etages = 0, salle_de_cours=20)
-                    print('champs=', champs)
-                    print('new_data:', new_data)
-                    db.update_data(self.curseur, "Batiments", name, id_batiment = new_data)
-                    print('ligne55')
-                else:
-                    print("Id batiment invalide")
-            else:
-                print(f"la colonne {champs} n'ext pas dans la table Batiments.")
-        else:
-            print("Ce batiment n'est pas enregistré dans la base de données.")
+            print('\n',' '*20,"Aucun batiment n'est encore enregistré.")
 
     def rechercher(self):
         """Rechercher par filtre dans la table Batiments"""
         while True:
-            print('\t','-'*8,"MENU RECHERCHER",'-'*8)
-            print('\t','-'*32)
-            print("Pour faire une recherche par filtre , vous devez choisir parmi les options suivantes")
-            print("1- Rechercher par id_batiment")
-            print("2- Afficher les salles d'un batiment")
-            print("3- Rechercher par nombre de salle")
-            print("4- Retour au menu batiment.")
-            print("5- Quitter le programme.")
-            choix = input("Faites votre choix: ")
+            clear_screen()
+            banner()
+            print(' '*20,'-'*32)
+            print(' '*20,'-'*8,"MENU RECHERCHER",'-'*8)
+            print(' '*20,'-'*32)
+            print('\n',' '*20,"Pour faire une recherche par filtre, ")
+            print(' '*20, "vous devez choisir parmi les options suivantes\n")
+            print(' '*20,"1- Rechercher par id_batiment")
+            print(' '*20,"2- Afficher les salles d'un batiment")
+            print(' '*20,"3- Rechercher par nombre de salle")
+            print(' '*20,"4- Retour au menu batiment.")
+            print(' '*20,"5- Quitter le programme.")
+            choix = is_empty("Faites votre choix [1-5]:")
             if choix == '1':
-                id_batiment = is_empty("Entrer l'id du Batiment a afficher: \n --> ")
-                if db.verify_data(self.curseur, "Batiments", "id_batiment", id_batiment) == True:
+                print(' '*20,"Entrer l'id du Batiment a afficher:")
+                id_batiment = is_empty("(x pour quitter)").upper()
+                if id_batiment == "X":
+                    return
+                elif db.verify_data(self.curseur, "Batiments", "id_batiment", id_batiment) == True:
                     datas = db.search_by_data(self.curseur, "Batiments","id_batiment", id_batiment)
                     columns= ['index','batiments','étages','salles']
                     largeur, separateur = afficher_entete(columns)
                     afficher_donnees(datas, largeur, separateur)
                 else:
-                    print("Ce batiment n'est pas enregistré dans la base de données.")
+                    print(' '*20,"Ce batiment n'est pas enregistré dans la base de données.") 
             elif choix == '2':
-                id_batiment = is_empty("Entrer l'id du batiment dont vous voulez afficher les salles:\n -->")
-                if db.verify_data(self.curseur, "Salles","id_batiment", id_batiment):
+                print(' '*20,"Entrer l'id du batiment dont vous voulez afficher les salles:")
+                id_batiment = is_empty("(x pour quitter)").upper()
+                if id_batiment == "X":
+                    return
+                elif db.verify_data(self.curseur, "Salles","id_batiment", id_batiment):
                     datas = db.search_by_data(self.curseur, "Salles", "id_batiment", id_batiment)
                     if datas:
-                        print(f"Voici les informations des salles se trouvant au batiment {id_batiment}.\n")
-                        print("_"*42)
-                        print("indexes|Salles|num_salle|batiment | etage | nombre de siege|statut |")
-                        for data in datas:
-                            print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4], "\t", data[5],"\t", data[6])
+                        print(' '*20,f"Voici les informations des salles se trouvant au batiment {id_batiment}.\n")
+                        columns= ['index','Salles','numero','batiment', 'etage', 'nombre de siege']
+                        largeur, separateur = afficher_entete(columns)
+                        afficher_donnees(datas, largeur, separateur)
                 else:
-                    print("Aucune salle trouvée.")
-            elif choix == 3:
-                nbre_salle = input("Entrer le nombre de salle: ")
-                datas = db.search_by_data(self.curseur, "Batiments","salle_de_cours", nbre_salle)
-                if datas == []:
-                    print(f"Aucun batiment ne contient {nbre_salle} salle(s).")
+                    print(' '*20,"Aucune salle trouvée.")
+            elif choix == '3':
+                print(' '*20, "Entrer le nombre de salle:")
+                nbre_salle = is_empty("(x pour quitter)")
+                if nbre_salle == "x":
+                    return
+                elif is_integer(nbre_salle):
+                    datas = db.search_by_data(self.curseur, "Batiments","salle_de_cours", nbre_salle)
+                    if datas :
+                        print(' '*20,f"Voici les informations des batiments contenant {nbre_salle} salle(s).\n")
+                        columns= ['index','batiments','étages','salles']
+                        largeur, separateur = afficher_entete(columns)
+                        afficher_donnees(datas, largeur, separateur)
+                    else:
+                        print(' '*20,f"Aucun batiment ne contient {nbre_salle} salle(s).")
                 else:
-                    print("indexes|batiments|étages|salles| salles disponibles")
-                    for data in datas:
-                        print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4],"\n")
+                    print(' '*20, "Vous devez enter un entier.")
             elif choix == '4':
-                nbre_etage = is_empty("Entrer le nombre de salle: \n -->")
-                datas = db.search_by_data(self.curseur, "Batiments","nombre_etages", nbre_etage)
-                if datas == []:
-                    print(f"Aucun batiment ne contient {nbre_etage} étage(s).")
-                else:
-                    print("indexes|batiments|étages|salles| salles disponibles")
-                    for data in datas:
-                        print(data[0], "\t|", data[1], "\t|", data[2],"\t|", data[3],"\t", data[4],"\n")
-            elif choix == '5':
                 break
-
+            elif choix == '5':
+                print(' '*20,"Fermeture du programme...")
+                attendre_touche()
+                exit()
+            else:
+                print(' '*20, "Vous devez choisir entre 1 a 5.")
+            attendre_touche()
     def supprimer(self):
-        id_batiment = is_empty("Entrer l'id du Batiment a supprimer:\n --> ")
-        if db.verify_data(self.curseur, "Batiments", "id_batiment", id_batiment) == True:
+        print(' '*20,"Entrer l'id du Batiment a supprimer:")
+        id_batiment = is_empty("(x pour quitter)").upper()
+        if id_batiment == 'X':
+            return
+        elif db.verify_data(self.curseur, "Batiments", "id_batiment", id_batiment) == True:
             while True: 
-                print(f"Etesvous sur de vouloir supprimer le batiment {id_batiment}?")
-                choix = input("1- Supprimer 2- Annuler\n -->")
+                print("\n\t\t\t\tATTENTION!")
+                Warning_= f"La supression du batiment {id_batiment} va entrainer la supression de toutes les salles de ce batiment."
+                Warning_1 = "La supression de ces salles vont entrainer la supression des horaires pour les cours qui y etaient programmés.\n"
+                afficher_texte_progressivement(Warning_)
+                afficher_texte_progressivement(Warning_1)
+                print(' '*20, f"Etesvous sur de vouloir poursuivre la supression du batiment {id_batiment}?")
+                choix = is_empty("1- Supprimer 2- Annuler")
                 if choix == '1':
                     #suppression des salles de ce batiment
                     #recuperantion des id des ces salles
@@ -142,72 +143,92 @@ class Gestion_Batiment:
                             salles_to_delete.append(salle[1])
 
                         #supprimer les salles de la liste salle_to_delete dans une boucle
+                        horaire_id = []
                         for id_ in salles_to_delete:
-                            print(f'suppresion de la salle {id_} du batiment {id_batiment}')
+                            print(' '*20,f'suppresion de la salle {id_} du batiment {id_batiment}')
                             db.delete_database(self.curseur, "Salles", "id_salle", id_)
-                        
-                        
-                   
+
+                            # recuperer la lister des horaire de chaque salle
+                            horaire_id.append((db.search_by_data(self.curseur, "Horaire", "code_salle", id_))[0][0])
+                        if horaire_id:
+                            # supprimer chaque id de chaque sous liste
+                            for id_list in horaire_id:                               
+                                print(' '*20, f"Supression de l'horaire {id_} de la tables des horaires.")
+                                db.delete_database(self.curseur, "Horaire", "id", id_)
+ 
                    #suppression du batiment
                     db.delete_database(self.curseur, "Batiments", "id_batiment", id_batiment)
-                    print(f"\nSuppression {id_batiment} et de toutes ses salles effectuée!")
+                    print(' '*20,f"Suppression du batiment {id_batiment} et de toutes ses salles effectuée!")
+                    
                     break
                 elif choix == '2':
                     break
                 else:
-                    print("Vous devez choisir entre l'option 1 et 2.")
+                    print(' '*20,"Vous devez choisir entre l'option 1 et 2.")
         else:
-            print("Ce batiment n'est pas enregistré dans la base de données.")
+            print(' '*20, "Ce batiment n'est pas enregistré dans la base de données.")
   
     def menu_batiment(self):
         """Fonction affichant les options de gestion des batiments"""
         while True:
-            print('\t','-'*32)
-            print('\t','-'*8,"MENU BATIMENT",'-'*8)
-            print('\t','-'*32)
-            print("Bienvenue au menu Batiments.")
-            print("Veuillez choisir votre option.")
-            print("1- Enregistrer un batiment.[admin only]")
-            print("2- Lister les batiments.")
-            print("3- Rechercher les information d'un batiment.")
-            print("4- Supprimer un batiment.[admin only]")
-            print("5- Retour au menu principal.")
-            print("6-Quitter le programme.")
+            clear_screen()
+            banner()
+            print(' '*20,'-'*32)
+            print(' '*20,'-'*8,"MENU BATIMENT",'-'*9)
+            print(' '*20,'-'*32)
+            print(' '*20,"Bienvenue au menu Batiments.\n")
+            print(' '*20,"Veuillez choisir votre option.")
+            print(' '*20,"1- Enregistrer un batiment.[admin]")
+            print(' '*20,"2- Lister tous les batiments.")
+            print(' '*20,"3- Rechercher les information d'un batiment.")
+            print(' '*20,"4- Supprimer un batiment.[admin]")
+            print(' '*20,"5- Retour au menu principal.")
+            print(' '*20,"6-Quitter le programme.")
             try:
-                choix = int(input("choix [1-6]: \n -->"))
+                choix = int(is_empty("Faite votre choix"))
             except Exception as e:
-                print("Erreur veuiller entrer un entier valide: ", e)
+                print(' '*20,"Erreur veuiller entrer un entier valide: ", e)
             else:
                 if choix < 1 or choix > 6:
-                    print("Veuillez choisir un chiffre entre 1 et 6")
+                    print(' '*20,"Veuillez choisir un chiffre entre 1 et 6")
                 else:
                     if self.adm_id :
                         if choix == 1:
                             self.enregistrer()
+                            attendre_touche()
                         elif choix == 2:
                             self.lister()
+                            attendre_touche()
                         elif choix == 3:
                             self.rechercher()
+                            attendre_touche()
                         elif choix == 4:
                             self.supprimer()
+                            attendre_touche()
                         elif choix == 5:
                             break 
                         else:
-                            print("\n\tFermeture du programme...\n")
+                            print('\n', ' '*20,"Fermeture du programme...\n")
+                            attendre_touche()
                             exit()  
                     else:
                         if choix == 1:
-                            print("Accès interdit. Seuls les admins peuvent faire des enregistrements.\n")
+                            print(' '*20,"Accès interdit. Seuls les admins peuvent faire des enregistrements.\n")
+                            attendre_touche()
                         elif choix == 2:
                             self.lister()
+                            attendre_touche()
                         elif choix == 3:
                             self.rechercher()
+                            attendre_touche()
                         elif choix == 4:
-                            print("Accès interdit. Seuls les admins peuvent faire des Suppressions.\n")
+                            print(' '*20,"Accès interdit. Seuls les admins peuvent faire des Suppressions.\n")
+                            attendre_touche()
                         elif choix == 5:
                             break   
                         else:
-                            print("\n\tFermeture du programme...\n")
+                            print('\n', ' '*20,"Fermeture du programme...\n")
+                            attendre_touche()
                             exit()
 
 

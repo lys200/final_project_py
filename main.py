@@ -4,7 +4,7 @@ import gestion_des_entites.Gestion_salles as sal
 import gestion_des_entites.Gestion_professeurs as prof
 import gestion_des_entites.Gestion_cours as crs
 import gestion_des_entites.Gestion_horaires as hor
-from gestion_des_contraintes.contraintes import attendre_touche, clear_screen, banner
+from gestion_des_contraintes.contraintes import is_empty,attendre_touche, clear_screen, banner, afficher_texte_progressivement
 
 def menu_pricipal(adm_id):
     while True:
@@ -23,16 +23,13 @@ def menu_pricipal(adm_id):
         print(" " * 20,"6- Retour au menu Système.")
         print(" " * 20,"7- Fermer le programme.")
         try: 
-            print(" " * 20,"Faites votre choix_1:\n ",)
-            choix_1 = int(input("          -->"))
+            choix_1 = int(is_empty("Faites votre choix [1-7]:"))
         except Exception as e:
             print(" " * 20,"Erreur, vous devez fournir un entier: ", e)
         else:
             if choix_1 < 1 or choix_1 > 7:
                 print(" " * 20,"Veuillez choisir un chiffre entre 1 et 6")
             else:
-                attendre_touche()
-                clear_screen()
                 if choix_1 == 1:
                     Batiment = bat.Gestion_Batiment(adm_id)
                     Batiment.menu_batiment()
@@ -57,6 +54,10 @@ def menu_pricipal(adm_id):
 
 def main():
     """Fonction principale contenant les fonctionnalites basiques du systeme"""
+    texte_bienvenue = """Bienvenue dans notre projet de gestion des salle du CHCL.\nil est recommané de lancer le programme dans une console pour une meilleure experience. """
+    clear_screen()
+    afficher_texte_progressivement(texte_bienvenue, 0.01)
+    attendre_touche()
     while True:
         clear_screen()
         banner()
