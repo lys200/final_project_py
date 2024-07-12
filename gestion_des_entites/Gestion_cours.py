@@ -1,8 +1,17 @@
+""""Projet final de Python 
+    Date de remise: 12 Juillet 2024
+    Nom des membres du Groupe:
+    BELCEUS Samienove R.
+    CHERELUS Solem
+    MORISSET Nherlyse
+    ST-PREUX Christine
+"""
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes import is_empty,attendre_touche, verifier_format_heure_v2,display_list_columns, afficher_texte_progressivement , afficher_entete, afficher_donnees
+from gestion_des_contraintes.contraintes import is_empty,attendre_touche,\
+    verifier_format_heure_v2, display_list_columns, afficher_texte_progressivement , afficher_entete, afficher_donnees
 """CREATE TABLE IF NOT EXISTS Cours (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_cours TEXT, 
+                id_cours TEXT,
                 nom_cours TEXT NOT NULL,
                 id_prof TEXT NOT NULL,
                 nom_fac TEXT,
@@ -21,7 +30,7 @@ class Gestion_Cours:
         nom = is_empty("Entrer le nom du cours:(x pour quitter).")
         if nom.lower() == 'x':
             return
-        
+
         fac = is_empty("Entrer la filière dans laquelle se dispense le cours: (x pour quitter)")
         # Dictionnaire des filières enseignées au Campus Henry Christophe de Limonade (CHCL)
         filieres_chcl = {
@@ -43,7 +52,7 @@ class Gestion_Cours:
                     niveau = int(niveau)
             except Exception as e:
                 print(' '*20,"L'entrée doit etre un chiffe: ", e)
-            else:  
+            else:
                 if niveau < 1 or niveau > 7:
                     print(' '*20,"le niveau doit etre de 1 a 7.")
                 else:
@@ -52,7 +61,7 @@ class Gestion_Cours:
         if db.verify_data(self.curseur, "Cours", "id_cours", id_crs):
             print(' '*20,f"Le cours de {nom} est deja enregistré pour le niveau L{niveau} en {fac}.")
         else:
-            while True: 
+            while True:
                 print('\n',' '*20,"Entrer l'id du professeur qui dispense ce cours:")
                 print(' '*20,"2- si le cours n'a pas encore de prof.")
                 prof = is_empty("x pour quitter")
