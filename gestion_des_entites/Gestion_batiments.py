@@ -1,5 +1,16 @@
+""""Projet final de Python 
+    Date de remise: 12 Juillet 2024
+    Nom des membres du Groupe:
+    BELCEUS Samienove R.
+    CHERELUS Solem
+    MORISSET Nherlyse
+    ST-PREUX Christine
+"""
+
+""""Ce fichier fait la gestion des batiments"""
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes import afficher_texte_progressivement, is_integer, attendre_touche, clear_screen,banner,is_empty, afficher_entete,afficher_donnees
+from gestion_des_contraintes.contraintes import afficher_texte_progressivement, \
+    is_integer, attendre_touche, clear_screen,banner,is_empty, afficher_entete, afficher_donnees
 """   base = 'test3.db'
     conn = db.connect_to_database(base)
     db.initialize_db(conn)
@@ -18,7 +29,7 @@ class Gestion_Batiment:
         self.curseur = db.connect_to_database("Gestion_des_salles.db")
         self.adm_id = adm_id
         db.initialize_conn(self.curseur)
-        
+  
     def enregistrer(self):
         """Enregistre un nouveau batiment"""
         while True:
@@ -28,7 +39,7 @@ class Gestion_Batiment:
                 return
             elif id_bat in ['A', 'B', 'C', 'D']:
                 break
-            else: 
+            else:
                 print(' '*20,"Le batiment doit etre A, B, C ou D.\n")
         #verifier que le id_batiment n'exsite pas deja dans la table Batiment
         is_batiment = db.search_by_data(self.curseur, "batiments", "id_batiment", id_bat)
@@ -40,7 +51,7 @@ class Gestion_Batiment:
             print(' '*20,"Par défaut, le nombre d'étages est fixé à 3 et le nombre de salle à 0.")
             print(' '*20,"Veuillez passer au menu salle pour enregistrer des salles dans le batiment de votre choix")
             print(' '*20,f"Le Batiment {id_bat} est enregistré aves succès.\n")
-            
+       
     def lister(self):
         """Lister toutes les lignes de la table Batiments"""
         datas = db.read_database(self.curseur, "Batiments")
@@ -79,7 +90,7 @@ class Gestion_Batiment:
                     largeur, separateur = afficher_entete(columns)
                     afficher_donnees(datas, largeur, separateur)
                 else:
-                    print(' '*20,"Ce batiment n'est pas enregistré dans la base de données.") 
+                    print(' '*20,"Ce batiment n'est pas enregistré dans la base de données.")
             elif choix == '2':
                 print(' '*20,"Entrer l'id du batiment dont vous voulez afficher les salles:")
                 id_batiment = is_empty("(x pour quitter)").upper()
@@ -101,7 +112,7 @@ class Gestion_Batiment:
                     return
                 elif is_integer(nbre_salle):
                     datas = db.search_by_data(self.curseur, "Batiments","salle_de_cours", nbre_salle)
-                    if datas :
+                    if datas:
                         print(' '*20,f"Voici les informations des batiments contenant {nbre_salle} salle(s).\n")
                         columns= ['index','batiments','étages','salles']
                         largeur, separateur = afficher_entete(columns)
@@ -125,10 +136,12 @@ class Gestion_Batiment:
         if id_batiment == 'X':
             return
         elif db.verify_data(self.curseur, "Batiments", "id_batiment", id_batiment) == True:
-            while True: 
+            while True:
                 print("\n\t\t\t\tATTENTION!")
-                Warning_= f"La supression du batiment {id_batiment} va entrainer la supression de toutes les salles de ce batiment."
-                Warning_1 = "La supression de ces salles vont entrainer la supression des horaires pour les cours qui y etaient programmés.\n"
+                Warning_= f"La supression du batiment {id_batiment} \
+                    va entrainer la supression de toutes les salles de ce batiment."
+                Warning_1 = "La supression de ces salles vont entrainer \
+                    la supression des horaires pour les cours qui y etaient programmés.\n"
                 afficher_texte_progressivement(Warning_)
                 afficher_texte_progressivement(Warning_1)
                 print(' '*20, f"Etesvous sur de vouloir poursuivre la supression du batiment {id_batiment}?")
@@ -147,19 +160,16 @@ class Gestion_Batiment:
                         for id_ in salles_to_delete:
                             print(' '*20,f'suppresion de la salle {id_} du batiment {id_batiment}')
                             db.delete_database(self.curseur, "Salles", "id_salle", id_)
-
                             # recuperer la lister des horaire de chaque salle
                             horaire_id.append((db.search_by_data(self.curseur, "Horaire", "code_salle", id_))[0][0])
                         if horaire_id:
-                            # supprimer chaque id de chaque sous liste
-                            for id_list in horaire_id:                               
+                        # supprimer chaque id de chaque sous liste
+                            for id_list in horaire_id:                       
                                 print(' '*20, f"Supression de l'horaire {id_} de la tables des horaires.")
                                 db.delete_database(self.curseur, "Horaire", "id", id_)
- 
-                   #suppression du batiment
+                    #suppression du batiment
                     db.delete_database(self.curseur, "Batiments", "id_batiment", id_batiment)
                     print(' '*20,f"Suppression du batiment {id_batiment} et de toutes ses salles effectuée!")
-                    
                     break
                 elif choix == '2':
                     break
@@ -167,7 +177,7 @@ class Gestion_Batiment:
                     print(' '*20,"Vous devez choisir entre l'option 1 et 2.")
         else:
             print(' '*20, "Ce batiment n'est pas enregistré dans la base de données.")
-  
+
     def menu_batiment(self):
         """Fonction affichant les options de gestion des batiments"""
         while True:
@@ -206,11 +216,11 @@ class Gestion_Batiment:
                             self.supprimer()
                             attendre_touche()
                         elif choix == 5:
-                            break 
+                            break
                         else:
                             print('\n', ' '*20,"Fermeture du programme...\n")
                             attendre_touche()
-                            exit()  
+                            exit()
                     else:
                         if choix == 1:
                             print(' '*20,"Accès interdit. Seuls les admins peuvent faire des enregistrements.\n")
@@ -225,10 +235,8 @@ class Gestion_Batiment:
                             print(' '*20,"Accès interdit. Seuls les admins peuvent faire des Suppressions.\n")
                             attendre_touche()
                         elif choix == 5:
-                            break   
+                            break
                         else:
                             print('\n', ' '*20,"Fermeture du programme...\n")
                             attendre_touche()
                             exit()
-
-

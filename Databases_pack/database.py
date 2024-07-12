@@ -1,5 +1,5 @@
 """
-    Ce ficher contient les fonctions de gestion de la base de donnee
+    Ce ficher contient les fonctions de gestion de la base de donnees
     pour la gestion des salles de cours au chcl.
 """
 import sqlite3
@@ -9,7 +9,7 @@ def connect_to_database(db_name):
     return sqlite3.connect(db_name)
 
 def initialize_conn(conn):
-    """initialisation de la base de donnee"""
+    """initialisation de la base de donnees"""
     try:
         curseur = conn.cursor()
          #creation des champ de la table "batiment"
@@ -74,8 +74,7 @@ def initialize_conn(conn):
                 UPDATE Cours
                 SET id_cours = substr(NEW.nom_cours, 1, 3) || "_" || substr(NEW.nom_fac, 1, 3)|| "_" ||'L'|| NEW.niveau
                 WHERE id = NEW.id;
-            END; ''') 
-
+            END; ''')
         #creation de la table professeurs
         curseur.execute(
             """CREATE TABLE IF NOT EXISTS Professeurs (
@@ -156,15 +155,15 @@ def initialize_conn(conn):
 #------------------------fonctions de gestion des donnees dans les tables-------------------------
 def insert_data(conn, table_name, **kwargs):
     """fonction pour inserer les donnees dans les tables"""
-    #en parametres: la base de donnee, le nom de la table, les donnees a inserer 
+    #en parametres: la base de donnee, le nom de la table, les donnees a inserer
     try:
         curseur = conn.cursor()
         # Préparer les colonnes et les valeurs pour l'insertion
         columns = ', '.join(kwargs.keys())
         placeholders = ', '.join('?' for _ in kwargs)
-        values = tuple(kwargs.values())       
+        values = tuple(kwargs.values())
         # Préparer la requête d'insertion
-        query = f'INSERT INTO {table_name} ({columns}) VALUES ({placeholders})' 
+        query = f'INSERT INTO {table_name} ({columns}) VALUES ({placeholders})'
         # Exécuter la requête avec les valeurs fournies
         curseur.execute(query, values)
         conn.commit()
@@ -177,8 +176,6 @@ def insert_data(conn, table_name, **kwargs):
         print('\n',' '*20,"Insertion réussie!!!")
 
 def read_database(conn, table_name):
-#cette fonction prend en param la table en question et la base de donnee
-#puis retourne les donnees de la table en question
     """fonction de lecture des tables de la base de donnees"""
     try:
         curseur = conn.cursor()
@@ -202,8 +199,8 @@ def search_by_data(conn, table_name, column_name, search_value):
 
 def update_data(conn, table_name,  id_entite, id_value,**kwargs):
     """Fonction pour modifier les donnees d'une table"""
-    #prend en parametres: la conn, le nom de la table, le nom de la cle primaire, 
-    #la valeur de l'id a modifier ainsi que l'ensenbles des colonnes a modifier , 
+    # prend en parametres: la conn, le nom de la table, le nom de la cle primaire,
+    # la valeur de l'id a modifier ainsi que l'ensenbles des colonnes a modifier,
     curseur = conn.cursor()
     # Préparer les colonnes et les valeurs pour la mise à jour
     columns = ', '.join(f'{key} = ?' for key in kwargs)
@@ -213,28 +210,28 @@ def update_data(conn, table_name,  id_entite, id_value,**kwargs):
     # Exécuter la requête avec les valeurs fournies
     curseur.execute(query, values)
     conn.commit()
-    
+
 def delete_database(conn, table_name, id_name, id_value):
     """fonction pour supprimmer n'inporte quelle info de n'inporte quelle table"""
-    #prend en parametres: la conn, le nom de la table, le nom de la cle primaire, 
+    #prend en parametres: la conn, le nom de la table, le nom de la cle primaire,
     #la valeur de l'id a supprimer
     curseur = conn.cursor()
-    query = f"DELETE FROM {table_name} WHERE {id_name} = ?"    
+    query = f"DELETE FROM {table_name} WHERE {id_name} = ?"
     curseur.execute(query,  (id_value,))
     conn.commit()
-    
+
 def verify_data(conn, table_name, column_name, valeur):
     """
     Vérifie si une information est deja enregistree dans la table ou l'on veut faire l'insertion.
     -return: True si la valeur existe, False sinon
     """
     try:
-        curseur = conn.cursor() 
+        curseur = conn.cursor()
         query = f"SELECT 1 FROM {table_name} WHERE {column_name} = ? LIMIT 1"
         curseur.execute(query, (valeur,))
         result = curseur.fetchone()
         #curseur.close()
-        #conn.close() 
+        #conn.close()
         return result is not None
     except sqlite3.Error as e:
         print(f"Erreur SQLite: {e}")
@@ -268,6 +265,7 @@ def filter_table(conn, table_name, **args):
     """
     Permet d'afficher autant de filtres possibles pour une table en utilisant des arguments nommés.
     """
+
     """
     :param cursor: Le curseur de la base de données.
     :param table_name: Le nom de la table dans laquelle effectuer la recherche.
@@ -275,12 +273,10 @@ def filter_table(conn, table_name, **args):
     :return: Les résultats de la requête filtrée.
     """
     curseur = conn.cursor()
-
     if not args:
         query = f"SELECT * FROM {table_name}"
         curseur.execute(query)
         return curseur.fetchall()
- 
     where_clause = " AND ".join([f"{col} = ?" for col in args.keys()])
     query = f"SELECT * FROM {table_name} WHERE {where_clause}"
     curseur.execute(query, tuple(args.values()))
@@ -302,7 +298,7 @@ def verifier_conflit(conn, jour,session, annee, heure_debut, heure_fin, salle):
     """
     curseur = conn.cursor()
     #si un cours se deroule dans cette salle , durant cette meme session de la meme annee
-    # dans l'intervalle des heures qui coindcident , il y a conflit
+    # dans l'intervalle des heures qui coincident , il y a conflit
     # e.g: bio en C203 session 2 anneee 2023 a 12h-13h et physique en c203 session 2 annee 2023 a 12h-13h
     query = '''
     SELECT 1 FROM Horaire
@@ -316,29 +312,12 @@ def verifier_conflit(conn, jour,session, annee, heure_debut, heure_fin, salle):
         OR (heure_debut >= ? AND heure_fin <= ?)
     )
     '''
-
-    curseur.execute(query, (salle, jour, session, annee, heure_fin, heure_debut, heure_debut, heure_fin, heure_debut, heure_fin))
+    curseur.execute(query,
+                    (salle, jour, session, annee, heure_fin, heure_debut, heure_debut, heure_fin, heure_debut, heure_fin))
     return curseur.fetchone() is not None
 
-def faire_jointure1(conn, table1, table2, colonne_table1, colonne_table2, colonne_afficher1, colonne_afficher2, condition):
-
-    try:
-        cursor = conn.cursor()
-        query = f'''
-        SELECT *
-        FROM {table1}
-        JOIN {table2} ON {table1}.{colonne_table1} = {table2}.{colonne_table2}
-        WHERE {condition}
-        '''
-        # query= '''SELECT * from Cours JOIN Horaire ON id_cours = code_cours'''
-        print(query)
-        cursor.execute(query)
-        return cursor.fetchall()
-    except sqlite3.Error as e:
-        print(f"Erreur: {e}")
-        return None
-    
 def faire_jointure(conn, table1, table2, colonne_table1, colonne_table2, colonne_afficher1, colonne_afficher2, condition):
+    """"fait jointure entre les tables"""
     try:
         cursor = conn.cursor()
         query = f'''
@@ -355,12 +334,13 @@ def faire_jointure(conn, table1, table2, colonne_table1, colonne_table2, colonne
         return None
 
 def get_column_values_starting_with(conn, table, column, starting_letter):
+    """verifie  si les colonnes commencent par telle ou telle lettre """
     try:
         cursor = conn.cursor()
         query = f'''
-        SELECT {column}
-        FROM {table}
-        WHERE {column} LIKE ?
+                    SELECT {column}
+                    FROM {table}
+                    WHERE {column} LIKE ?
         '''
         cursor.execute(query, (f'{starting_letter}%',))
         return cursor.fetchall()
@@ -369,9 +349,9 @@ def get_column_values_starting_with(conn, table, column, starting_letter):
         return None
     
 def afficher_horaires(conn, faculte=None, niveau=None, id_prof=None):
+    """Fonction affichant les horaires"""
     # Connexion à la base de données
     cursor = conn.cursor()
-    
     # Construire la requête SQL
     query = f"""
     SELECT Horaire.*
@@ -379,7 +359,6 @@ def afficher_horaires(conn, faculte=None, niveau=None, id_prof=None):
     JOIN Cours ON Horaire.code_cours = Cours.id_cours
     WHERE 1=1
     """
-    
     # Ajouter les conditions en fonction des paramètres donnés
     params = []
     if faculte:
@@ -391,10 +370,10 @@ def afficher_horaires(conn, faculte=None, niveau=None, id_prof=None):
     if id_prof:
         query += " AND Cours.id_prof = ?"
         params.append(id_prof)
-    
     # Exécuter la requête et récupérer les résultats
     cursor.execute(query, params)
     return cursor.fetchall()
+    
     
 def afficher_horaire(conn):
     """Fonction qui formatte l'affichage de tous les horaires 
@@ -415,7 +394,6 @@ def afficher_horaire(conn):
     jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
     heures = [f'{h:02}:00' for h in range(8, 17)]
     column_width = 15
-    
     # Organisation des données par année, session, niveau, et faculté
     horaires = {}
     for row in rows:
@@ -427,7 +405,6 @@ def afficher_horaire(conn):
         
         heure_debut_int = int(heure_debut.split(':')[0])
         heure_fin_int = int(heure_fin.split(':')[0])
-        
         for heure in range(heure_debut_int, heure_fin_int + 1):
             heure_str = f'{heure:02}:00'
             if heure_str in horaires[key] and jour in horaires[key][heure_str]:
