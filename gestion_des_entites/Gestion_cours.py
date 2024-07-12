@@ -18,11 +18,11 @@ class Gestion_Cours:
         
     def enregistrer(self):
         """Enregistre un nouveau cours"""
-        nom = is_empty("Entrer le nom du cours:(x pour quitter).")
+        nom = is_empty("Entrer le nom du cours:(x pour quitter).").capitalize()
         if nom.lower() == 'x':
             return
         
-        fac = is_empty("Entrer la filière dans laquelle se dispense le cours: (x pour quitter)")
+        fac = is_empty("Entrer la filière dans laquelle se dispense le cours: (x pour quitter)").capitalize()
         # Dictionnaire des filières enseignées au Campus Henry Christophe de Limonade (CHCL)
         filieres_chcl = {
             "Sciences de la Santé": ["Médecine", "Pharmacie", "Biologie médicale", "Soins infirmiers"],

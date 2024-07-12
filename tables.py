@@ -1,100 +1,85 @@
-# import sqlite3
+import sqlite3
+from time import sleep
 
-# def afficher_donnees_table(database_path, table_name):
-#     # Connexion a baz de done a
-#     conn = sqlite3.connect(database_path)
-#     cursor = conn.cursor()
+def afficher_horaire(conn):
+    """Fonction qui formatte l'affichage de tous les horaires 
+    param conn: connection a la base de donnee
+    """
+    # Requête SQL pour obtenir les données nécessaires
+    query = """
+    SELECT H.annee, H.session, C.niveau, C.nom_fac, H.jour, H.heure_debut, H.heure_fin, H.nom_cours, H.code_salle
+    FROM Horaire H
+    JOIN Cours C ON H.code_cours = C.id_cours
+    ORDER BY H.annee, H.session, C.niveau, C.nom_fac;
+    """
     
-#     # rekipere des noms de colonnes
-#     cursor.execute(f"PRAGMA table_info({table_name})")
-#     columns_info = cursor.fetchall()
-#     column_names = [info[1] for info in columns_info]
-    
-#     # prendre les données de la table
-#     cursor.execute(f"SELECT * FROM {table_name}")
-#     rows = cursor.fetchall()
-    
-#     # Détermination de la largeur des colonnes
-#     column_widths = [max(len(str(value)) for value in column) for column in zip(*([column_names] + rows))]
-    
-#     # Création d'une ligne de séparation
-#     separator = '+' + '+'.join('-' * (width + 2) for width in column_widths) + '+'
-    
-#     # Affichage de l'entête de la table
-#     header = '|' + '|'.join(f' {name:<{width}} ' for name, width in zip(column_names, column_widths)) + '|'
-#     print(separator)
-#     print(header)
-#     print(separator)
-    
-#     # Affichage des lignes de la table
-#     for row in rows:
-#         line = '|' + '|'.join(f' {str(value):<{width}} ' for value, width in zip(row, column_widths)) + '|'
-#         print(line)
-#     print(separator)
-    
-#     # Fermeture de la connexion
-#     cursor.close()
-#     conn.close()
+    cursor = conn.execute(query)
+    rows = cursor.fetchall()
+        # Définition des jours de la semaine et des plages horaires
 
-# # Exemple d'utilisation
-# afficher_donnees_table('gestion_des_entites\Gestion_des_salles.db', 'Cours')
-
-
-def afficher_entete(column_names):
-    # Détermination de la largeur des colonnes
-    column_widths = [len(name) for name in column_names]
+    jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
+    heures = [f'{h:02}:00' for h in range(8, 17)]
+    column_width = 15
     
-    # Création d'une ligne de séparation
-    separator = '+' + '+'.join('-' * (width + 2) for width in column_widths) + '+'
+    # Organisation des données par année, session, niveau, et faculté
+    horaires = {}
+    for row in rows:
+        annee, session, niveau, faculte, jour, heure_debut, heure_fin, cours, salle = row
+        key = (annee, session, niveau, faculte)
+        
+        if key not in horaires:
+            horaires[key] = {heure: {jour: '' for jour in jours} for heure in heures}
+        
+        heure_debut_int = int(heure_debut.split(':')[0])
+        heure_fin_int = int(heure_fin.split(':')[0])
+        
+        for heure in range(heure_debut_int, heure_fin_int + 1):
+            heure_str = f'{heure:02}:00'
+            if heure_str in horaires[key] and jour in horaires[key][heure_str]:
+                if heure_fin_int - heure_debut_int > 2:
+                    if heure == heure_debut_int:
+                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                    elif heure == heure_fin_int:
+                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                    elif heure == heure_debut_int + 1:
+                        horaires[key][heure_str][jour] = f"{cours}"
+                    elif heure == heure_debut_int + 2:
+                        horaires[key][heure_str][jour] = f"{salle}"
+                    else:
+                        horaires[key][heure_str][jour] = '.' * (column_width - 1)
+                
+                elif heure_fin_int - heure_debut_int == 2:
+                    if heure == heure_debut_int:
+                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                    elif heure == heure_fin_int:
+                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                    elif heure == heure_debut_int + 1:
+                        horaires[key][heure_str][jour] = f"{cours} ({salle})"
+
+                elif heure_fin_int - heure_debut_int < 2:
+                    if heure == heure_debut_int:
+                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                    elif heure == heure_fin_int:
+                        horaires[key][heure_str][jour] = f"{cours} ({salle})"
     
-    # Affichage de l'entête de la table
-    header = '|' + '|'.join(f' {name:<{width}} ' for name, width in zip(column_names, column_widths)) + '|'
-    print(separator)
-    print(header)
-    print(separator)
-    
-    return column_widths, separator
+    # Affichage de l'horaire
+    for key, horaire in horaires.items():
+        annee, session, niveau, faculte = key
+        print(f"Horaire {session} {annee} - Niveau {niveau}, Faculté de {faculte}:")
+        print(' ' * 15 + '+' + '+'.join('-' * (column_width + 2) for _ in jours) + '+' +'-'*17 + '+')
+        # Affichage de l'en-tête
+        entete = f"| {'Heure':<{column_width}} | " + ' | '.join(f"{jour.capitalize():<{column_width}}" for jour in jours) + " |"
+        print(' ' * 15 + entete)
+        print(' ' * 15 + '+' + '+'.join('-' * (column_width + 2) for _ in jours) + '+' +'-'*17 + '+')
+        
+        for heure in heures:
+            row = f"| {heure:<{column_width}} | " + ' | '.join(f"{horaire[heure][jour]:<{column_width}}" for jour in jours) + " |"
+            print(' ' * 15 + row)
+        
+        print(' ' * 15 + '+' + '+'.join('-' * (column_width + 2) for _ in jours) + '+' +'-'*17 + '+')
+        print('\n' +' '*33 + '-'*91 + '\n')
 
-def afficher_donnees(data, column_widths, separator):
-    # Affichage des lignes de la table
-    for row in data:
-        line = '|' + '|'.join(f' {str(value):<{width}} ' for value, width in zip(row, column_widths)) + '|'
-        print(line)
-    print(separator)
-
-# Exemple d'utilisation
-entete = ['VoyageId', 'code_Personnel']
-donnees = [
-    [2, '001'],
-    [1, '006'],
-    [3, '009'],
-    [4, '008'],
-    [5, '001'],
-    [6, '006'],
-    [7, '001'],
-    [8, '006'],
-    [9, '001'],
-    [10, '009']
-]
-
-# Affichage de l'entête et des données
-column_widths, separator = afficher_entete(entete)
-afficher_donnees(donnees, column_widths, separator)
-
-def modifier(self):        
-        """Modifie les infos d'un batiment"""
-        name = is_empty("Entrer le nom/id du batiments a modifier (x pour quitter):").upper()
-        if name == 'X':
-            return
-        elif db.verify_data(self.curseur, "Batiments", "id_batiment", name) == True:
-            champs = is_empty("Entrer le champs a modifier [id_Batiment]: ")
-            if db.verify_column(self.curseur, "Batiments", champs) == True:
-                new_data = is_empty(f"Entrer la nouvelle valeur du champ {champs},[A-B-C-D]:")
-                if new_data :
-                    db.update_data(self.curseur, "Batiments", name, id_batiment = new_data)
-                else:
-                    print(' '*20,"Id batiment invalide")
-            else:
-                print(' '*20,f"la colonne {champs} n'ext pas dans la table Batiments.")
-        else:
-            print(' '*20,"Ce batiment n'est pas enregistré dans la base de données.")
+# Exemple d'utilisation de la fonction
+conn = sqlite3.connect('Gestion_des_salles.db')  # Remplacez 'database.db' par le chemin de votre base de données
+afficher_horaire(conn)
+conn.close()

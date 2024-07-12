@@ -82,7 +82,7 @@ class Gestion_admin(Person):
                 print(" " * 20,'-'*32, '\n')
 
                 print(" " * 20,"Bienvenue au menu des adminitrateurs.")
-                print(" " * 20,"Veuillez choisire parmi les options ci-dessous.")
+                print(" " * 20,"Veuillez choisir parmi les options ci-dessous.")
                 print(" " * 20,"1- Se connecter.")
                 print(" " * 20,"2- Creer un nouveau compte d'administrateur.")
                 print(" " * 20,"3- Afficher les administrateurs.")

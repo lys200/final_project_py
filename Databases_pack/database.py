@@ -353,6 +353,7 @@ def faire_jointure(conn, table1, table2, colonne_table1, colonne_table2, colonne
     except sqlite3.Error as e:
         print(f"Erreur: {e}")
         return None
+
 def get_column_values_starting_with(conn, table, column, starting_letter):
     try:
         cursor = conn.cursor()
@@ -367,8 +368,6 @@ def get_column_values_starting_with(conn, table, column, starting_letter):
         print(f"An error occurred: {e}")
         return None
     
-
-
 def afficher_horaires(conn, faculte=None, niveau=None, id_prof=None):
     # Connexion à la base de données
     cursor = conn.cursor()
@@ -397,12 +396,22 @@ def afficher_horaires(conn, faculte=None, niveau=None, id_prof=None):
     cursor.execute(query, params)
     return cursor.fetchall()
     
-    
 def afficher_horaire(conn):
-    # Extraction des données
-    cursor = conn.execute("SELECT * FROM horaire ORDER BY annee, session, niveau, faculte")
-    rows = cursor.fetchall()
+    """Fonction qui formatte l'affichage de tous les horaires 
+    param conn: connection a la base de donnee
+    """
+    # Requête SQL pour obtenir les données nécessaires
+    query = """
+    SELECT H.annee, H.session, C.niveau, C.nom_fac, H.jour, H.heure_debut, H.heure_fin, H.nom_cours, H.code_salle
+    FROM Horaire H
+    JOIN Cours C ON H.code_cours = C.id_cours
+    ORDER BY H.annee, H.session, C.niveau, C.nom_fac;
+    """
     
+    cursor = conn.execute(query)
+    rows = cursor.fetchall()
+        # Définition des jours de la semaine et des plages horaires
+
     jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
     heures = [f'{h:02}:00' for h in range(8, 17)]
     column_width = 15
@@ -410,37 +419,57 @@ def afficher_horaire(conn):
     # Organisation des données par année, session, niveau, et faculté
     horaires = {}
     for row in rows:
-        annee, session, niveau, faculte, jour, heure_debut, heure_fin, cours = row[5], row[6], row[7], row[8], row[1], row[2], row[3], row[4]
+        annee, session, niveau, faculte, jour, heure_debut, heure_fin, cours, salle = row
+        key = (annee, session, niveau, faculte)
         
-        if annee not in horaires:
-            horaires[annee] = {}
-        if session not in horaires[annee]:
-            horaires[annee][session] = {}
-        if niveau not in horaires[annee][session]:
-            horaires[annee][session][niveau] = {}
-        if faculte not in horaires[annee][session][niveau]:
-            horaires[annee][session][niveau][faculte] = {heure: {jour: '' for jour in jours} for heure in heures}
+        if key not in horaires:
+            horaires[key] = {heure: {jour: '' for jour in jours} for heure in heures}
         
         heure_debut_int = int(heure_debut.split(':')[0])
         heure_fin_int = int(heure_fin.split(':')[0])
         
         for heure in range(heure_debut_int, heure_fin_int + 1):
             heure_str = f'{heure:02}:00'
-            if heure_str in horaires[annee][session][niveau][faculte] and jour in horaires[annee][session][niveau][faculte][heure_str]:
-                if heure == heure_debut_int:
-                    horaires[annee][session][niveau][faculte][heure_str][jour] = cours
-                else:
-                    horaires[annee][session][niveau][faculte][heure_str][jour] = '.' * (column_width - 1)
+            if heure_str in horaires[key] and jour in horaires[key][heure_str]:
+                if heure_fin_int - heure_debut_int > 2:
+                    if heure == heure_debut_int:
+                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                    elif heure == heure_fin_int:
+                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                    elif heure == heure_debut_int + 1:
+                        horaires[key][heure_str][jour] = f"{cours}"
+                    elif heure == heure_debut_int + 2:
+                        horaires[key][heure_str][jour] = f"{salle}"
+                    else:
+                        horaires[key][heure_str][jour] = '.' * (column_width - 1)
+                
+                elif heure_fin_int - heure_debut_int == 2:
+                    if heure == heure_debut_int:
+                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                    elif heure == heure_fin_int:
+                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                    elif heure == heure_debut_int + 1:
+                        horaires[key][heure_str][jour] = f"{cours} ({salle})"
+
+                elif heure_fin_int - heure_debut_int < 2:
+                    if heure == heure_debut_int:
+                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                    elif heure == heure_fin_int:
+                        horaires[key][heure_str][jour] = f"{cours} ({salle})"
     
     # Affichage de l'horaire
-    for annee, sessions in horaires.items():
-        for session, niveaux in sessions.items():
-            for niveau, facultes in niveaux.items():
-                for faculte, horaire in facultes.items():
-                    print(f"Horaire {session} {annee} - Niveau {niveau}, Faculté de {faculte}:")
-                    # afficher_entete(['Heure'] + [jour.capitalize() for jour in jours], column_width)
-                    for heure in heures:
-                        row = f"| {heure:<{column_width}} | " + ' | '.join(f"{horaire[heure][jour]:<{column_width}}" for jour in jours) + " |"
-                        print(' ' * 15 + row)
-                    print(' ' * 15 + '+' + '+'.join('-' * (column_width + 2) for _ in jours) + '+')
-                    print('\n' + '-'*80 + '\n')
+    for key, horaire in horaires.items():
+        annee, session, niveau, faculte = key
+        print(f"Horaire {session} {annee} - Niveau {niveau}, Faculté de {faculte}:")
+        print(' ' * 15 + '+' + '+'.join('-' * (column_width + 2) for _ in jours) + '+' +'-'*17 + '+')
+        # Affichage de l'en-tête
+        entete = f"| {'Heure':<{column_width}} | " + ' | '.join(f"{jour.capitalize():<{column_width}}" for jour in jours) + " |"
+        print(' ' * 15 + entete)
+        print(' ' * 15 + '+' + '+'.join('-' * (column_width + 2) for _ in jours) + '+' +'-'*17 + '+')
+        
+        for heure in heures:
+            row = f"| {heure:<{column_width}} | " + ' | '.join(f"{horaire[heure][jour]:<{column_width}}" for jour in jours) + " |"
+            print(' ' * 15 + row)
+        
+        print(' ' * 15 + '+' + '+'.join('-' * (column_width + 2) for _ in jours) + '+' +'-'*17 + '+')
+        print('\n' +' '*33 + '-'*91 + '\n')
