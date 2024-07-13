@@ -1,4 +1,4 @@
-""""Projet final de Python 
+""""Projet final de Python
     Date de remise: 12 Juillet 2024
     Nom des membres du Groupe:
     BELCEUS Samienove R.
@@ -15,32 +15,34 @@ import gestion_des_entites.Gestion_professeurs as prof
 import gestion_des_entites.Gestion_cours as crs
 import gestion_des_entites.Gestion_horaires as hor
 from gestion_des_contraintes.contraintes \
-    import is_empty,attendre_touche, clear_screen, banner, afficher_texte_progressivement
+    import (is_empty, attendre_touche, clear_screen, banner,
+            afficher_texte_progressivement)
+
 
 def menu_pricipal(adm_id):
     """Menu principal de toutes les gestions"""
     while True:
         clear_screen()
         banner()
-        print(" " * 20,'\t','*'*32)
-        print(" " * 20,'\t','*'*8,"MENU PRINCIPAL",'*'*8)
-        print(" " * 20,'\t','*'*32)
-        print(" " * 20,"Bienvenue au menu Principal.\n")
-        print(" " * 20,"Veuillez choisir votre option.")
-        print(" " * 20,"1- Gestion des batiments.")
-        print(" " * 20,"2- Gestion des salles.")
-        print(" " * 20,"3- Gestion des cours.")
-        print(" " * 20,"4- Gestion des horaires.")
-        print(" " * 20,"5- Gestion des Professeurs.")
-        print(" " * 20,"6- Retour au menu Système.")
-        print(" " * 20,"7- Fermer le programme.")
+        print(" " * 20, '\t', '*'*32)
+        print(" " * 20, '\t', '*'*8, "MENU PRINCIPAL", '*'*8)
+        print(" " * 20, '\t', '*'*32)
+        print(" " * 20, "Bienvenue au menu Principal.\n")
+        print(" " * 20, "Veuillez choisir votre option.")
+        print(" " * 20, "1- Gestion des batiments.")
+        print(" " * 20, "2- Gestion des salles.")
+        print(" " * 20, "3- Gestion des cours.")
+        print(" " * 20, "4- Gestion des horaires.")
+        print(" " * 20, "5- Gestion des Professeurs.")
+        print(" " * 20, "6- Retour au menu Système.")
+        print(" " * 20, "7- Fermer le programme.")
         try:
             choix_1 = int(is_empty("Faites votre choix [1-7]:"))
         except TypeError as e:
-            print(" " * 20,"Erreur, vous devez fournir un entier: ", e)
+            print(" " * 20, "Erreur, vous devez fournir un entier: ", e)
         else:
             if choix_1 < 1 or choix_1 > 7:
-                print(" " * 20,"Veuillez choisir un chiffre entre 1 et 6")
+                print(" " * 20, "Veuillez choisir un chiffre entre 1 et 6")
             else:
                 if choix_1 == 1:
                     batiment = bat.Gestion_Batiment(adm_id)
@@ -60,28 +62,31 @@ def menu_pricipal(adm_id):
                 elif choix_1 == 6:
                     main()
                 elif choix_1 == 7:
-                    print(" " * 20,"Fermeture du programme.")
+                    print(" " * 20, "Fermeture du programme.")
                     attendre_touche()
                     sortir()
 
+
 def main():
     """Fonction principale contenant les fonctionnalites basiques du systeme"""
-    texte_bienvenue = """Bienvenue dans notre projet de gestion des salle du CHCL.\n
-        il est recommandé de lancer le programme dans une console pour une meilleure experience. """
+    texte_bienvenue = """Bienvenue dans notre projet de
+        gestion des salle du CHCL.\n
+        il est recommandé de lancer le programme
+        dans une console pour une meilleure experience. """
     clear_screen()
     afficher_texte_progressivement(texte_bienvenue, 0.01)
     attendre_touche()
     while True:
         clear_screen()
         banner()
-        print(" " * 20,'\t','*'*32)
-        print(" " * 20,'\t','-'*8,"MENU SYSTEME",'-'*8)
-        print(" " * 20,'\t','*'*32)
-        print(" " * 20,"Bienvenu au Système de Gestion des salles du CHCL.\n")
-        print(" " * 20,"Comment voulez vous y acceder au systeme?")
-        print(" " * 20,"1- Administrateur")
-        print(" " * 20,"2- Invité")
-        print(" " * 20,"3- Quitter\n ")
+        print(" " * 20, '\t', '*'*32)
+        print(" " * 20, '\t', '-'*8, "MENU SYSTEME", '-'*8)
+        print(" " * 20, '\t', '*'*32)
+        print(" " * 20, "Bienvenu au Système de Gestion des salles du CHCL.\n")
+        print(" " * 20, "Comment voulez vous y acceder au systeme?")
+        print(" " * 20, "1- Administrateur")
+        print(" " * 20, "2- Invité")
+        print(" " * 20, "3- Quitter\n ")
         choix_0 = input("            -->")
 
         if choix_0 == '1':
@@ -96,11 +101,12 @@ def main():
             adm_id = False
             menu_pricipal(adm_id)
         elif choix_0 == '3':
-            print(" " * 20,"Fermeture du programme.")
+            print(" " * 20, "Fermeture du programme.")
             attendre_touche()
             sortir()
         else:
-            print(" " * 20,"Vous devez choisir entre 1 et 2.")
+            print(" " * 20, "Vous devez choisir entre 1 et 2.")
+
 
 if __name__ == '__main__':
     main()

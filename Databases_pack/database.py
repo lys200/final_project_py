@@ -4,42 +4,44 @@
 """
 import sqlite3
 
+
 def connect_to_database(db_name):
     """connection a la database"""
     return sqlite3.connect(db_name)
+
 
 def initialize_conn(conn):
     """initialisation de la base de donnees"""
     try:
         curseur = conn.cursor()
-         #creation des champ de la table "batiment"
+        # creation des champ de la table "batiment"
         curseur.execute(
             """CREATE TABLE IF NOT EXISTS Batiments (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_batiment TEXT, 
+                id_batiment TEXT,
                 nombre_etages INTEGER,
                 salle_de_cours INTEGER
                 )
             """)
 
-        #creation de la table Salle
+        # creation de la table Salle
         curseur.execute(
             """CREATE TABLE IF NOT EXISTS Salles (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_salle TEXT, 
+                id_salle TEXT,
                 num_salle INTEGER NOT NULL,
                 id_batiment TEXT,
                 etage INTEGER NOT NULL,
                 nombre_de_siege INTEGER NOT NULL
                 )
-        """ )
+        """)
 
-        #creation de declencheurs pour generer les id composés
-        #supprimer le declencheur s'il existe deja
+        # creation de declencheurs pour generer les id composés
+        # supprimer le declencheur s'il existe deja
         curseur.execute('''
             DROP TRIGGER IF EXISTS after_insert_salles
         ''')
-        #creer du declencheur
+        # creer du declencheur
         curseur.execute('''
             CREATE TRIGGER after_insert_salles
             AFTER INSERT ON Salles
@@ -50,11 +52,11 @@ def initialize_conn(conn):
                 where id = NEW.id;
             END;
         ''')
-        #creation de la table cours
+        # creation de la table cours
         curseur.execute(
             """CREATE TABLE IF NOT EXISTS Cours (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_cours TEXT, 
+                id_cours TEXT,
                 nom_cours TEXT,
                 nom_fac TEXT,
                 niveau INTEGER NOT NULL,
@@ -62,7 +64,7 @@ def initialize_conn(conn):
                 duree TEXT NOT NULL)
         """)
 
-        #creation du declencheur pour la table cours
+        # creation du declencheur pour la table cours
         curseur.execute('''
             DROP TRIGGER IF EXISTS after_insert_cours
         ''')
@@ -72,21 +74,23 @@ def initialize_conn(conn):
             FOR EACH ROW
             BEGIN
                 UPDATE Cours
-                SET id_cours = substr(NEW.nom_cours, 1, 3) || "_" || substr(NEW.nom_fac, 1, 3)|| "_" ||'L'|| NEW.niveau
+                SET id_cours = substr(NEW.nom_cours, 1, 3)
+                        || "_" || substr(NEW.nom_fac, 1, 3)
+                        || "_" ||'L'|| NEW.niveau
                 WHERE id = NEW.id;
             END; ''')
-        #creation de la table professeurs
+        # creation de la table professeurs
         curseur.execute(
             """CREATE TABLE IF NOT EXISTS Professeurs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_prof TEXT PRYMARY KEY, 
+                id_prof TEXT PRYMARY KEY,
                 nom_prof TEXT NOT NULL,
                 prenom_prof TEXT NOT NULL,
                 tel_prof TEXT NOT NULL,
                 email TEXT NOT NULL)
         """)
 
-        #creation du declencheur pour la table Professeurs
+        # creation du declencheur pour la table Professeurs
         curseur.execute('''
             DROP TRIGGER IF EXISTS after_insert_prof
         ''')
@@ -96,11 +100,14 @@ def initialize_conn(conn):
             FOR EACH ROW
             BEGIN
                 UPDATE Professeurs
-                SET id_prof = substr(NEW.nom_prof, 1, 3) || substr(NEW.prenom_prof, 1, 3) || NEW.id
+                SET id_prof = substr(NEW.nom_prof, 1, 3)
+                        || substr(NEW.prenom_prof, 1, 3)
+                        || NEW.id
                 WHERE id = NEW.id;
             END;
         ''')
-        #declencheur pour mettre a jour l'id apres modification de la table professeurs
+        # declencheur pour mettre a jour l'id apres
+        # modification de la table professeurs
         curseur.execute('''
             DROP TRIGGER IF EXISTS after_update_prof
         ''')
@@ -110,11 +117,13 @@ def initialize_conn(conn):
             FOR EACH ROW
             BEGIN
                 UPDATE Professeurs
-                SET id_prof = substr(NEW.nom_prof, 1, 3) || substr(NEW.prenom_prof, 1, 3) || NEW.id
+                SET id_prof = substr(NEW.nom_prof, 1, 3)
+                        || substr(NEW.prenom_prof, 1, 3)
+                        || NEW.id
                 WHERE id = NEW.id;
             END;
         ''')
-        #creation de la table horaires
+        # creation de la table horaires
         curseur.execute(
             """CREATE TABLE IF NOT EXISTS Horaire (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -127,16 +136,16 @@ def initialize_conn(conn):
                 session TEXT NOT NULL,
                 annee INTEGER NOT NULL)
         """)
-        #creation de la table des administrateurs
+        # creation de la table des administrateurs
         curseur.execute(
             """CREATE TABLE IF NOT EXISTS Administrateurs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,  
-                id_admin TEXT, 
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_admin TEXT,
                 nom_admin TEXT NOT NULL,
                 prenom_admin TEXT NOT NULL,
                 password TEXT NOT NULL)
         """)
-        #creation du declencheur pour la table des administrateurs
+        # creation du declencheur pour la table des administrateurs
         curseur.execute('''DROP TRIGGER IF EXISTS after_insert_admin''')
         curseur.execute('''
             CREATE TRIGGER after_insert_admin
@@ -144,7 +153,11 @@ def initialize_conn(conn):
             FOR EACH ROW
             BEGIN
                 UPDATE Administrateurs
-                SET id_admin = "admin_" || substr(NEW.nom_admin, 1, 3) || substr(NEW.prenom_admin, 1, 3) || NEW.id
+                SET id_admin =
+                        "admin_"
+                        || substr(NEW.nom_admin, 1, 3)
+                        || substr(NEW.prenom_admin, 1, 3)
+                        || NEW.id
                 WHERE id = NEW.id;
             END;
         ''')
@@ -152,10 +165,15 @@ def initialize_conn(conn):
     except sqlite3.OperationalError as e:
         print("Erreur d'initialisation de la base de donnee: ", e)
 
-#------------------------fonctions de gestion des donnees dans les tables-------------------------
+# ----------------------------------------------------
+# fonctions de gestion des donnees dans les tables
+# ----------------------------------------------------
+
+
 def insert_data(conn, table_name, **kwargs):
     """fonction pour inserer les donnees dans les tables"""
-    #en parametres: la base de donnee, le nom de la table, les donnees a inserer
+    # en parametres: la base de donnee,
+    # le nom de la table, les donnees a inserer
     try:
         curseur = conn.cursor()
         # Préparer les colonnes et les valeurs pour l'insertion
@@ -168,12 +186,13 @@ def insert_data(conn, table_name, **kwargs):
         curseur.execute(query, values)
         conn.commit()
     except sqlite3.OperationalError as error:
-        print(f"Echec de l'insertion des donnees dans la table {table_name}", error)
+        print(f"Echec de l'insertion des donnees dans la table {table_name}",
+              error)
     except sqlite3.IntegrityError as e:
         print(f"Erreur d'integrite dans la table {table_name}:", e)
-        #print("veuillez verifier que cette id se trouve deja dans la table , puis reesayer ")
     else:
-        print('\n',' '*20,"Insertion réussie!!!")
+        print('\n', ' '*20, "Insertion réussie!!!")
+
 
 def read_database(conn, table_name):
     """fonction de lecture des tables de la base de donnees"""
@@ -182,9 +201,10 @@ def read_database(conn, table_name):
         query = f'SELECT * FROM {table_name}'
         curseur.execute(query)
         datas = curseur.fetchall()
-        return  datas
+        return datas
     except sqlite3.OperationalError as e:
         print('erreur: ', e)
+
 
 def search_by_data(conn, table_name, column_name, search_value):
     """Fonction pour rechercher une valeur dans la table/filtrer"""
@@ -197,10 +217,13 @@ def search_by_data(conn, table_name, column_name, search_value):
     rows = cursor.fetchall()
     return rows
 
-def update_data(conn, table_name,  id_entite, id_value,**kwargs):
+
+def update_data(conn, table_name,  id_entite, id_value, **kwargs):
     """Fonction pour modifier les donnees d'une table"""
-    # prend en parametres: la conn, le nom de la table, le nom de la cle primaire,
-    # la valeur de l'id a modifier ainsi que l'ensenbles des colonnes a modifier,
+    # prend en parametres: la conn, le nom de la table,
+    # le nom de la cle primaire,
+    # la valeur de l'id a modifier ainsi que
+    # l'ensenbles des colonnes a modifier,
     curseur = conn.cursor()
     # Préparer les colonnes et les valeurs pour la mise à jour
     columns = ', '.join(f'{key} = ?' for key in kwargs)
@@ -211,31 +234,35 @@ def update_data(conn, table_name,  id_entite, id_value,**kwargs):
     curseur.execute(query, values)
     conn.commit()
 
+
 def delete_database(conn, table_name, id_name, id_value):
-    """fonction pour supprimmer n'inporte quelle info de n'inporte quelle table"""
-    #prend en parametres: la conn, le nom de la table, le nom de la cle primaire,
-    #la valeur de l'id a supprimer
+    """fonction pour supprimmer n'inporte quelle
+    info de n'inporte quelle table"""
+    # prend en parametres: la conn, le nom de la table,
+    # le nom de la cle primaire,
+    # la valeur de l'id a supprimer
     curseur = conn.cursor()
     query = f"DELETE FROM {table_name} WHERE {id_name} = ?"
     curseur.execute(query,  (id_value,))
     conn.commit()
 
+
 def verify_data(conn, table_name, column_name, valeur):
     """
-    Vérifie si une information est deja enregistree dans la table ou l'on veut faire l'insertion.
-    -return: True si la valeur existe, False sinon
+    Vérifie si une information est deja enregistree dans
+    la table ou l'on veut faire l'insertion.
+    return: True si la valeur existe, False sinon
     """
     try:
         curseur = conn.cursor()
         query = f"SELECT 1 FROM {table_name} WHERE {column_name} = ? LIMIT 1"
         curseur.execute(query, (valeur,))
         result = curseur.fetchone()
-        #curseur.close()
-        #conn.close()
         return result is not None
     except sqlite3.Error as e:
         print(f"Erreur SQLite: {e}")
         return False
+
 
 def verify_column(conn, table_name, column_name):
     """
@@ -248,7 +275,8 @@ def verify_column(conn, table_name, column_name):
     try:
         # Connexion à la base de données
         cursor = conn.cursor()
-        # Exécution de la requête PRAGMA pour obtenir les informations des colonnes
+        # Exécution de la requête PRAGMA pour obtenir
+        # les informations des colonnes
         query = f"PRAGMA table_info({table_name})"
         cursor.execute(query)
         columns_info = cursor.fetchall()
@@ -261,9 +289,11 @@ def verify_column(conn, table_name, column_name):
         print(f"Erreur SQLite: {e}")
         return False
 
+
 def filter_table(conn, table_name, **args):
     """
-    Permet d'afficher autant de filtres possibles pour une table en utilisant des arguments nommés.
+    Permet d'afficher autant de filtres possibles
+    pour une table en utilisant des arguments nommés.
     """
 
     """
@@ -283,7 +313,9 @@ def filter_table(conn, table_name, **args):
     datas = curseur.fetchall()
     return datas
 
-def verifier_conflit(conn, jour,session, annee, heure_debut, heure_fin, salle):
+
+def verifier_conflit(conn, jour, session, annee,
+                     heure_debut, heure_fin, salle):
     """
     Vérifie si un cours existe déjà dans l'intervalle de temps donné.
     """
@@ -297,9 +329,11 @@ def verifier_conflit(conn, jour,session, annee, heure_debut, heure_fin, salle):
     :return: True si un conflit est détecté, False sinon
     """
     curseur = conn.cursor()
-    #si un cours se deroule dans cette salle , durant cette meme session de la meme annee
+    # si un cours se deroule dans cette salle ,
+    # durant cette meme session de la meme annee
     # dans l'intervalle des heures qui coincident , il y a conflit
-    # e.g: bio en C203 session 2 anneee 2023 a 12h-13h et physique en c203 session 2 annee 2023 a 12h-13h
+    # e.g: bio en C203 session 2 anneee 2023 a 12h-13h
+    # et physique en c203 session 2 annee 2023 a 12h-13h
     query = '''
     SELECT 1 FROM Horaire
     WHERE code_salle = ?
@@ -313,10 +347,13 @@ def verifier_conflit(conn, jour,session, annee, heure_debut, heure_fin, salle):
     )
     '''
     curseur.execute(query,
-                    (salle, jour, session, annee, heure_fin, heure_debut, heure_debut, heure_fin, heure_debut, heure_fin))
+                    (salle, jour, session, annee, heure_fin, heure_debut,
+                     heure_debut, heure_fin, heure_debut, heure_fin))
     return curseur.fetchone() is not None
 
-def faire_jointure(conn, table1, table2, colonne_table1, colonne_table2, colonne_afficher1, colonne_afficher2, condition):
+
+def faire_jointure(conn, table1, table2, colonne_table1, colonne_table2,
+                   colonne_afficher1, colonne_afficher2, condition):
     """"fait jointure entre les tables"""
     try:
         cursor = conn.cursor()
@@ -333,6 +370,7 @@ def faire_jointure(conn, table1, table2, colonne_table1, colonne_table2, colonne
         print(f"Erreur: {e}")
         return None
 
+
 def get_column_values_starting_with(conn, table, column, starting_letter):
     """verifie  si les colonnes commencent par telle ou telle lettre """
     try:
@@ -347,7 +385,8 @@ def get_column_values_starting_with(conn, table, column, starting_letter):
     except sqlite3.Error as e:
         print(f"An error occurred: {e}")
         return None
-    
+
+
 def afficher_horaires(conn, faculte=None, niveau=None, id_prof=None):
     """Fonction affichant les horaires"""
     # Connexion à la base de données
@@ -373,39 +412,44 @@ def afficher_horaires(conn, faculte=None, niveau=None, id_prof=None):
     # Exécuter la requête et récupérer les résultats
     cursor.execute(query, params)
     return cursor.fetchall()
-        
+
+
 def afficher_horaire(conn):
-    """Fonction qui formatte l'affichage de tous les horaires 
+    """Fonction qui formatte l'affichage de tous les horaires
     param conn: connection a la base de donnee
     """
     # Requête SQL pour obtenir les données nécessaires
     query = """
-    SELECT H.annee, H.session, C.niveau, C.nom_fac, H.jour, H.heure_debut, H.heure_fin, H.nom_cours, H.code_salle
+    SELECT H.annee, H.session, C.niveau, C.nom_fac, H.jour,
+    H.heure_debut, H.heure_fin, H.nom_cours, H.code_salle
     FROM Horaire H
     JOIN Cours C ON H.code_cours = C.id_cours
     ORDER BY H.annee, H.session, C.niveau, C.nom_fac;
     """
-    
+
     cursor = conn.execute(query)
     rows = cursor.fetchall()
-        # Définition des jours de la semaine et des plages horaires
+    # Définition des jours de la semaine et des plages horaires
 
     jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
     heures = [f'{h:02}:00' for h in range(8, 17)]
-    column_width = 15
-    
+    col_width = 15
+
     # Organisation des données par année, session, niveau, et faculté
     horaires = {}
     for row in rows:
-        annee, session, niveau, faculte, jour, heure_debut, heure_fin, cours, salle = row
+        annee, session, niveau, faculte, jour, h_debut, h_fin, cours, salle = (
+            row)
         key = (annee, session, niveau, faculte)
-        
+
         if key not in horaires:
-            horaires[key] = {heure: {jour: '' for jour in jours} for heure in heures}
-        
-        heure_debut_int = int(heure_debut.split(':')[0])
-        heure_fin_int = int(heure_fin.split(':')[0])
-        
+            horaires[key] = {
+                heure:
+                {jour: '' for jour in jours} for heure in heures}
+
+        heure_debut_int = int(h_debut.split(':')[0])
+        heure_fin_int = int(h_fin.split(':')[0])
+
         for heure in range(heure_debut_int, heure_fin_int + 1):
             heure_str = f'{heure:02}:00'
             if heure_str in horaires[key] and jour in horaires[key][heure_str]:
@@ -419,8 +463,8 @@ def afficher_horaire(conn):
                     elif heure == heure_debut_int + 2:
                         horaires[key][heure_str][jour] = f"{salle}"
                     else:
-                        horaires[key][heure_str][jour] = '.' * (column_width - 1)
-                
+                        horaires[key][heure_str][jour] = '.' * (col_width - 1)
+
                 elif heure_fin_int - heure_debut_int == 2:
                     if heure == heure_debut_int:
                         horaires[key][heure_str][jour] = f"{"-"*15}"
@@ -434,20 +478,39 @@ def afficher_horaire(conn):
                         horaires[key][heure_str][jour] = f"{"-"*15}"
                     elif heure == heure_fin_int:
                         horaires[key][heure_str][jour] = f"{cours} ({salle})"
-    
+
     # Affichage de l'horaire
     for key, horaire in horaires.items():
         annee, session, niveau, faculte = key
-        print(f"Horaire {session} {annee} - Niveau {niveau}, Faculté de {faculte}:")
-        print(' ' * 15 + '+' + '+'.join('-' * (column_width + 2) for _ in jours) + '+' +'-'*17 + '+')
+        print(' ' * 20,
+              f"Horaire session: {session} {annee} - Niveau {niveau}"
+              "Faculté de {faculte}:")
+        print(' ' * 15 +
+              '+' + '+'.join('-' * (col_width + 2) for _ in jours) +
+              '+' + '-' * 17 + '+')
         # Affichage de l'en-tête
-        entete = f"| {'Heure':<{column_width}} | " + ' | '.join(f"{jour.capitalize():<{column_width}}" for jour in jours) + " |"
+        entete = (f"| {'Heure':<{col_width}} | " +
+                  ' | '.join(
+                      f"{jour.capitalize():<{col_width}}" for jour in jours) +
+                  " |")
         print(' ' * 15 + entete)
-        print(' ' * 15 + '+' + '+'.join('-' * (column_width + 2) for _ in jours) + '+' +'-'*17 + '+')
-        
+        print(' ' * 15 +
+              '+' +
+              '+'.join('-' * (col_width + 2) for _ in jours
+                       ) +
+              '+' + '-' * 17 + '+')
+
         for heure in heures:
-            row = f"| {heure:<{column_width}} | " + ' | '.join(f"{horaire[heure][jour]:<{column_width}}" for jour in jours) + " |"
+            row = (
+                f"| {heure:<{col_width}} | "
+                + ' | '.join(
+                    f"{horaire[heure][jour]:<{col_width}}" for jour in jours
+                    )
+                + " |"
+                )
             print(' ' * 15 + row)
-        
-        print(' ' * 15 + '+' + '+'.join('-' * (column_width + 2) for _ in jours) + '+' +'-'*17 + '+')
-        print('\n' +' '*33 + '-'*91 + '\n')
+
+        print(' ' * 15 + '+' +
+              '+'.join('-' * (col_width + 2) for _ in jours),
+              '+' + '-' * 17 + '+')
+        print('\n' + ' ' * 33 + '-' * 91 + '\n')
