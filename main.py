@@ -17,7 +17,7 @@ import gestion_des_entites.Gestion_cours as crs
 import gestion_des_entites.Gestion_horaires as hor
 from gestion_des_contraintes.contraintes \
     import (is_empty, attendre_touche, clear_screen, banner,
-            afficher_texte_progressivement)
+            afficher_texte_progressivement, func_exit)
 
 
 def menu_pricipal(adm_id):
@@ -63,9 +63,7 @@ def menu_pricipal(adm_id):
                 elif choix_1 == 6:
                     main()
                 elif choix_1 == 7:
-                    print(" " * 20, "Fermeture du programme.")
-                    attendre_touche()
-                    sortir()
+                    func_exit()
 
 
 def main():

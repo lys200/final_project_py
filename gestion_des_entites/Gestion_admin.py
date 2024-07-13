@@ -96,7 +96,7 @@ class Gestion_admin(Person):
                 choix = is_empty("Faites votres choix:")
                 if choix in ['1','2','3','4']:
                     if choix == '1':
-                        self.adm_id = self.c()
+                        self.adm_id = self.connection_adm()
                         attendre_touche()
                         clear_screen()
                         break

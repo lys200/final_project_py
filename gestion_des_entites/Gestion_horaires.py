@@ -385,9 +385,7 @@ class Gestion_Horaire:
                 elif choix == '6':
                     break
                 elif choix == '7':
-                    print(" "*20, "Fermeture du programme...")
-                    attendre_touche()
-                    exit()
+                    func_exit()
                 else:
                     print(" "*20, "Veuillez choisir un chiffre entre 1 et 7.\n")
                     attendre_touche()
@@ -530,7 +528,7 @@ class Gestion_Horaire:
                 break
 
             elif choix == '10':
-                exit()
+                func_exit()
 
             else:
                 print(' '*20,"Entrée invalide, Veuillez choisir entre les options proposées.")
@@ -617,9 +615,7 @@ class Gestion_Horaire:
                         elif choix == 6:
                             break  
                         else:
-                            print(' '*20,"\tFermeture du programme...\n")
-                            attendre_touche()
-                            exit() 
+                            func_exit()
                     else:
                         if choix == 1:
                             print(' '*20,"Accès interdit. Seuls les admins peuvent faire des enregistrements.\n")
@@ -634,6 +630,4 @@ class Gestion_Horaire:
                         elif choix == 6:
                             break  
                         else:
-                            print(' '*20,"\tFermeture du programme...\n")
-                            attendre_touche()
-                            exit()
+                            func_exit()

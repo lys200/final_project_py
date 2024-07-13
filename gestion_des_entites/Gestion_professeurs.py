@@ -8,7 +8,7 @@ ST-PREUX Christine
 """
 
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes import banner, afficher_entete, afficher_donnees, is_empty, is_valid_email, is_valid_phone_number, clear_screen, attendre_touche, Person, afficher_texte_progressivement
+from gestion_des_contraintes.contraintes import func_exit, banner, afficher_entete, afficher_donnees, is_empty, is_valid_email, is_valid_phone_number, clear_screen, attendre_touche, Person, afficher_texte_progressivement
 '''id INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_prof TEXT PRYMARY KEY, 
                 nom_prof TEXT NOT NULL,
@@ -124,7 +124,7 @@ class Gestion_Professeur:
                 elif choix == '5':
                     break #or return
                 elif choix == '6':
-                    exit()
+                    func_exit()
                 else:
                     print(' '*20,"Vous devez choisir un chiffre entre 1 a 6.")
         else:
@@ -156,7 +156,7 @@ class Gestion_Professeur:
                 break
 
             elif choix == '3':
-                exit()
+                func_exit()
 
             else:
                 print(' '*20,"Entrée invalide, Veuillez choisir entre les options proposées.")
@@ -247,9 +247,7 @@ class Gestion_Professeur:
                         elif choix == 6:
                             break  
                         else:
-                            print(' '*20,"\n\tFermeture du programme...\n")
-                            attendre_touche()
-                            exit() 
+                            func_exit()
                     else:
                         if choix == 1:
                             print(' '*20,"Accès interdit. Seuls les admins peuvent faire des enregistrements.\n")
@@ -269,7 +267,5 @@ class Gestion_Professeur:
                         elif choix == 6:
                             break  
                         else:
-                            print(' '*20,"Fermeture du programme...\n")
-                            attendre_touche()
-                            exit()
+                            func_exit()
                     
