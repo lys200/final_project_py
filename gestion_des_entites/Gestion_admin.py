@@ -88,7 +88,7 @@ class Gestion_admin(Person):
                 print(" " * 20,"2- Creer un nouveau compte d'administrateur.")
                 print(" " * 20,"3- Afficher les administrateurs.")
                 print(" " * 20,"4- Quitter")
-                choix = input("                    Faites votres choix: \n                    -->")
+                choix = is_empty("Faites votres choix:")
                 if choix in ['1','2','3','4']:
                     if choix == '1':
                         self.adm_id = self.Connection_adm()

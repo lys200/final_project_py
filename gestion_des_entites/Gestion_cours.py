@@ -95,13 +95,13 @@ class Gestion_Cours:
                 elif verifier_format_heure_v2(duree):
                     heure_h, minute_m = map(int, duree.split(':'))
                     total_minutes = heure_h * 60 + minute_m
-                    if (total_minutes > 60) and (total_minutes < 360):
+                    if (total_minutes >= 60) and (total_minutes <= 360):
                         db.insert_data(self.curseur, 'Cours', nom_cours = nom, nom_fac = fac, niveau = niveau, id_prof = prof, duree = duree)
                         break
                     else:
                         while True:
                             print(' '*20,"La durée ne doit pas etre inferieure a 1h ou superieure a 6h.")
-                            ch = input("1- reassayer         2- abandonner l'enregistrement")
+                            ch = is_empty("1- reassayer         2- abandonner l'enregistrement")
                             if ch == '1':
                                 break
                             elif ch == '2':
@@ -377,9 +377,9 @@ class Gestion_Cours:
     def menu_cours (self) :
         """Fonction affichant les options de gestion des Cours"""
         while True:
-            print('\n\t','-'*32)        
-            print('\t','-'*8,"MENU COURS",'-'*8)
-            print('\t','-'*32,'\n')        
+            print(' '*20,'-'*32)        
+            print(' '*21,'-'*9,"MENU COURS",'-'*9)
+            print(' '*20,'-'*32,'\n')        
             print(' '*20,"Bienvenue au menu des cours.")
             print(' '*20,"Veuillez choisir votre option.\n")
             print(' '*20,"1- Enregistrer un cours.")

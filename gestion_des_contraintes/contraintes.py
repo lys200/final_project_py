@@ -23,7 +23,7 @@ def is_empty(input_message):
         if user_input:
             return user_input
         else:
-            print(' '*20,"L'entrée ne peut pas être vide ou ne contenir que des espaces. Veuillez réessayer.")
+            print(' '*20,"L'entrée ne peut pas être vide ou ne contenir que des espaces. Veuillez réessayer.\n")
             
 def is_integer(number):
     try:

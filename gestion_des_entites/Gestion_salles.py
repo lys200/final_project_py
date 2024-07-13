@@ -71,7 +71,6 @@ class Gestion_Salle:
                                 # incrementer le nombre de salle du batiment
                                 datas_batiment= db.search_by_data(self.connection, "Batiments", "id_batiment", batiment)
                                 db.update_data(self.connection, "Batiments", "id_batiment", batiment.upper(), salle_de_cours = (datas_batiment[0][3] + 1))
-                                attendre_touche()
                                 break
                     break
             else:
