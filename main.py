@@ -1,10 +1,11 @@
-""""Projet final de Python
-    Date de remise: 12 Juillet 2024
-    Nom des membres du Groupe:
-    BELCEUS Samienove R.
-    CHERELUS Solem
-    MORISSET Nherlyse
-    ST-PREUX Christine
+"""Projet final de Python.
+
+Date de remise: 12 Juillet 2024
+Nom des membres du Groupe:
+BELCEUS Samienove R.
+CHERELUS Solem
+MORISSET Nherlyse
+ST-PREUX Christine
 """
 
 from sys import exit as sortir
@@ -20,7 +21,7 @@ from gestion_des_contraintes.contraintes \
 
 
 def menu_pricipal(adm_id):
-    """Menu principal de toutes les gestions"""
+    """Menu principal de toutes les gestions."""
     while True:
         clear_screen()
         banner()
@@ -68,7 +69,7 @@ def menu_pricipal(adm_id):
 
 
 def main():
-    """Fonction principale contenant les fonctionnalites basiques du systeme"""
+    """Fonction principale contenant le fonctionnalites basiques du systeme."""
     texte_bienvenue = """Bienvenue dans notre projet de
         gestion des salle du CHCL.\n
         il est recommandé de lancer le programme
