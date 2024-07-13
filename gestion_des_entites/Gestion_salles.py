@@ -9,8 +9,7 @@ ST-PREUX Christine
 
 
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes \
-import is_empty, banner,is_integer, afficher_donnees, afficher_entete,afficher_texte_progressivement, attendre_touche, clear_screen
+from gestion_des_contraintes.contraintes import is_empty, banner,is_integer, afficher_donnees, afficher_entete,afficher_texte_progressivement, attendre_touche, clear_screen
 
 """CREATE TABLE IF NOT EXISTS Salles (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,8 +52,7 @@ class Gestion_Salle:
                         else:
                             while True:
                                 print(' '*20,f"voici les numeros de salle pour cette étage:")
-                                numero_salles =  [f'{num_etage}01' ,\
-                                f'{num_etage}02', f'{num_etage}03', f'{num_etage}04', f'{num_etage}05', f'{num_etage}06']
+                                numero_salles =  [f'{num_etage}01' , f'{num_etage}02', f'{num_etage}03', f'{num_etage}04', f'{num_etage}05', f'{num_etage}06']
                                 print(' '*20,f'{num_etage}01', f'\t{num_etage}02', f'\t{num_etage}03')
                                 print(' '*20,f'{num_etage}04', f'\t{num_etage}05', f'\t{num_etage}06')
                                 print(' '*20,"Choisir le numero de la salle[1-6]:")
@@ -82,20 +80,16 @@ class Gestion_Salle:
                             if sieges < 0 or sieges > 70:
                                 print(' '*20,"Le nombre de sieges doit etre compris entre 0 et 70 maximum.")
                             else:
-                                db.insert_data(self.connection, "Salles",\
-                                num_salle = int(numero_salle), id_batiment = batiment.upper(), \
-                                    etage = int(num_etage), nombre_de_siege = sieges)
+                                db.insert_data(self.connection, "Salles", num_salle = int(numero_salle), id_batiment = batiment.upper(), etage = int(num_etage), nombre_de_siege = sieges)
                                 # incrementer le nombre de salle du batiment
                                 datas_batiment= db.search_by_data(self.connection, "Batiments", "id_batiment", batiment)
-                                db.update_data(self.connection, "Batiments", \
-                                            "id_batiment", batiment.upper(), salle_de_cours = (datas_batiment[0][3] + 1))
+                                db.update_data(self.connection, "Batiments", "id_batiment", batiment.upper(), salle_de_cours = (datas_batiment[0][3] + 1))
                                 break
                     break
             else:
                 while True:
                     print(' '*20,f"Le Batiment {batiment} n'est pas enregistré dans la table Batiment.")
-                    print(' '*20,"Veuillez d'abord l'enregistrer dans le menu 'batiment' \
-                          pour pouvoir enregistrer la salle.\n")
+                    print(' '*20,"Veuillez d'abord l'enregistrer dans le menu 'batiment' pour pouvoir enregistrer la salle.\n")
                     ch = is_empty("1- Reessayer\t 2-Abandonner l'enregistrement")
                     if ch == "1":
                         break
