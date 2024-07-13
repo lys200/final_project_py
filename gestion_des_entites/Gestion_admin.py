@@ -1,21 +1,26 @@
-""" Ici on trouve les codes concernant l'authentification de l'administrateur."""
+"""Ici on trouve les codes concernant l'authentification de l'administrateur."""
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes import banner,is_empty, hash_password,Person, attendre_touche, clear_screen,is_valid_password, afficher_entete, afficher_donnees
+from gestion_des_contraintes.contraintes \
+    import banner,is_empty, hash_password,Person, \
+        attendre_touche, clear_screen,is_valid_password, afficher_entete, afficher_donnees
 
 class Gestion_admin(Person):
-    """Classe de gestion des administrateurs"""
+    """Classe gerant  les proprietes des administrateurs."""
+
     def __init__(self):
+        """Constructeur de la classe dans lequel on passe les attributs."""
         self.curseur = db.connect_to_database("Gestion_des_salles.db")
         db.initialize_conn(self.curseur)
         self.adm_id = False
 
-    def Connection_adm(self):
-        """Methode de connection des administrateurs"""
+    def connection_adm(self):
+        """Methode permettant de connecter des administrateurs."""
         id_adm = is_empty("Entrer votre id(x pour quitter): ")
 
         if id_adm == 'x':
             return
         is_adm = db.search_by_data(self.curseur, "Administrateurs", "id_admin",id_adm,)
+
         if is_adm:
             mdp = is_empty("Entrer votre mot de passe:(x pour quitter):")
             if mdp == 'x':
@@ -24,15 +29,14 @@ class Gestion_admin(Person):
                 print(' '*30,"Connexion reussie!")
                 print(' '*20,f"Bienvenue {is_adm[0][2]} {is_adm[0][3]}!")
                 return id_adm
-            else:
-                print('\n',' '*20,"Mot de passe incorrect")
-                return False
+            print('\n',' '*20,"Mot de passe incorrect")
+            return False
         else:
             print('\n',' '*20,"Id invalide.")
             return False
 
     def new_adm_account(self):
-        """Methode permettant d'ajouter un nouveau administrateur"""
+        """Methode permettant d'ajouter un nouveau administrateur."""
         personne = Person()
         nom = personne.f_name()
         if nom.lower() == 'x':
@@ -52,12 +56,13 @@ class Gestion_admin(Person):
                 break
             print('\n',' '*15,"Le mot de passe doit avoir au moins une majuscule, un chiffre et un caractère spécial.")
         hashed_password = hash_password(password)
-        db.insert_data(self.curseur, "Administrateurs", nom_admin = nom, prenom_admin = prenom, password = hashed_password)
+        db.insert_data(self.curseur, "Administrateurs", \
+                       nom_admin = nom, prenom_admin = prenom, password = hashed_password)
         print("\n\n",'\n',' '*20,f"Bienvenue {nom} {prenom}! Vous etes maintenant administrateurs. ")
         print('\n',' '*20,"Une id vous a été attribuée. Veuillez afficher les admins pour récupérer le votre.")
 
     def show_adm_accounts(self):
-        """cette methode affiche les comptes des administrateurs"""
+        """Cette methode affiche les comptes des administrateurs."""
         datas = db.read_database(self.curseur, "Administrateurs")
         if datas:
             print("\t\t\tVoici la liste des administrateurs enregistrés: ")
@@ -69,7 +74,7 @@ class Gestion_admin(Person):
             print(' '*20,"Aucun administrateur n'est encore enregistré.")
 
     def menu_adm (self):
-        """Menu de Gestion des administrateurs"""
+        """Menu de Gestion des administrateurs."""
         banner()
         print(' '*20, '-'*8,"MENU D'AUTHENTIFICATION",'-'*8)
         print(' '*20,'-'*41)
@@ -91,7 +96,7 @@ class Gestion_admin(Person):
                 choix = is_empty("Faites votres choix:")
                 if choix in ['1','2','3','4']:
                     if choix == '1':
-                        self.adm_id = self.Connection_adm()
+                        self.adm_id = self.c()
                         attendre_touche()
                         clear_screen()
                         break

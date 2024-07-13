@@ -1,11 +1,12 @@
-""""Projet final de Python 
-    Date de remise: 12 Juillet 2024
-    Nom des membres du Groupe:
-    BELCEUS Samienove R.
-    CHERELUS Solem
-    MORISSET Nherlyse
-    ST-PREUX Christine
+"""Projet final de Python 
+Date de remise: 12 Juillet 2024
+Nom des membres du Groupe:
+BELCEUS Samienove R.
+CHERELUS Solem
+MORISSET Nherlyse
+ST-PREUX Christine
 """
+
 import Databases_pack.database as db
 from gestion_des_contraintes.contraintes import is_empty,attendre_touche,\
     verifier_format_heure_v2, banner, clear_screen, afficher_texte_progressivement , afficher_entete, afficher_donnees
@@ -18,15 +19,16 @@ from gestion_des_contraintes.contraintes import is_empty,attendre_touche,\
                 duree TEXT NOT NULL)
         """ 
 class Gestion_Cours:
-    """Class contenant toutes les fonctions relative a la gestion des Salles"""
+    """Classe contenant toutes les fonctions relative a la gestion des Salles."""
     
     def __init__(self, adm_id):
+        """Methode constructeur pour la classe cours."""
         self.curseur = db.connect_to_database("Gestion_des_salles.db")
         self.adm_id = adm_id
         db.initialize_conn(self.curseur)
         
     def enregistrer(self):
-        """Enregistre un nouveau cours"""
+        """Enregistre un nouveau cours."""
         nom = is_empty("Entrer le nom du cours:(x pour quitter).").capitalize()
         if nom.lower() == 'x':
             return
@@ -121,7 +123,7 @@ class Gestion_Cours:
                             print(' '*20,'Choisissez entre 1 et 2')
                     
     def lister(self):
-        """Lister tous les Cours de la table Cours"""
+        """Lister tous les Cours de la table Cours."""
         datas = db.read_database(self.curseur, "Cours")
         if not datas:
             print("\n", ' '*20,"Aucun cours n'est encore enregistré.\n")
@@ -132,7 +134,7 @@ class Gestion_Cours:
             afficher_donnees(datas, largeur, separateur)
             
     def modifier(self):        
-        """Modifier les infos d'un cours"""
+        """Modify les infos d'un cours."""
         id_cours = is_empty("Entrer le id du cours a modifier (x pour quitter):")
         if id_cours == 'x':
             return
@@ -213,7 +215,7 @@ class Gestion_Cours:
             print(' '*20,"Ce cours n'est pas enregistré dans la base de données.")
 
     def rechercher(self):
-        """filtrer la table cours"""
+        """Filtrer les infos de la table cours."""
         while True:
             clear_screen()
             banner()
@@ -375,7 +377,7 @@ class Gestion_Cours:
             print(' '*20,"Ce cours n'est pas enregistré dans la base de données.")
   
     def menu_cours (self) :
-        """Fonction affichant les options de gestion des Cours"""
+        """Fonction affichant les options de gestion des Cours."""
         while True:
             print(' '*20,'-'*32)        
             print(' '*21,'-'*9,"MENU COURS",'-'*9)

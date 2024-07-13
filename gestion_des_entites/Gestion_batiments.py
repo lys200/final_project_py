@@ -1,13 +1,15 @@
-""""Projet final de Python 
-    Date de remise: 12 Juillet 2024
-    Nom des membres du Groupe:
-    BELCEUS Samienove R.
-    CHERELUS Solem
-    MORISSET Nherlyse
-    ST-PREUX Christine
+"""Projet final de Python 
+Date de remise: 12 Juillet 2024
+Nom des membres du Groupe:
+BELCEUS Samienove R.
+CHERELUS Solem
+MORISSET Nherlyse
+ST-PREUX Christine
+
 """
 
-""""Ce fichier fait la gestion des batiments"""
+""""Ce fichier fait la gestion des batiments."""
+
 import Databases_pack.database as db
 from gestion_des_contraintes.contraintes import afficher_texte_progressivement, \
     is_integer, attendre_touche, clear_screen,banner,is_empty, afficher_entete, afficher_donnees
@@ -21,17 +23,19 @@ from gestion_des_contraintes.contraintes import afficher_texte_progressivement, 
 print(bat)
 """
 class Gestion_Batiment:
-    """Class contenant toutes les fonctions relative a la gestion des batiments"""
+    """Class contenant toutes les fonctions relative a la gestion des batiments."""
+
     #curseur = db.Connect_to_database("Gestion_des_salles.db")
     #db.initialize_db(curseur)
     #choix = 0
     def __init__(self, adm_id):
+        """Methode de constructeur gerant les attributs du batiments."""
         self.curseur = db.connect_to_database("Gestion_des_salles.db")
         self.adm_id = adm_id
         db.initialize_conn(self.curseur)
   
     def enregistrer(self):
-        """Enregistre un nouveau batiment"""
+        """Enregistre un nouveau batiment."""
         while True:
             print(' '*20,"Entrer le nom du batiment[A-D]:")
             id_bat = is_empty("(x pour quitter)").upper()
@@ -53,7 +57,7 @@ class Gestion_Batiment:
             print(' '*20,f"Le Batiment {id_bat} est enregistré aves succès.\n")
        
     def lister(self):
-        """Lister toutes les lignes de la table Batiments"""
+        """Lister toutes les lignes de la table Batiments."""
         datas = db.read_database(self.curseur, "Batiments")
         if datas:
             print(' '*20,"Voici les informations enregistrées concernant les batiments:\n ")
@@ -64,7 +68,7 @@ class Gestion_Batiment:
             print('\n',' '*20,"Aucun batiment n'est encore enregistré.")
 
     def rechercher(self):
-        """Rechercher par filtre dans la table Batiments"""
+        """Rechercher par filtre dans la table Batiments."""
         while True:
             clear_screen()
             banner()
@@ -132,6 +136,7 @@ class Gestion_Batiment:
             attendre_touche()
     
     def supprimer(self):
+        """Methode permettant de supprimer un batiment."""
         print(' '*20,"Entrer l'id du Batiment a supprimer:")
         id_batiment = is_empty("(x pour quitter)").upper()
         if id_batiment == 'X':
@@ -180,7 +185,7 @@ class Gestion_Batiment:
             print(' '*20, "Ce batiment n'est pas enregistré dans la base de données.")
 
     def menu_batiment(self):
-        """Fonction affichant les options de gestion des batiments"""
+        """Fonction affichant les options de gestion des batiments."""
         while True:
             clear_screen()
             banner()
