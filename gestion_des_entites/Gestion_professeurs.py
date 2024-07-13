@@ -1,3 +1,12 @@
+"""Projet final de Python 
+Date de remise: 12 Juillet 2024
+Nom des membres du Groupe:
+BELCEUS Samienove R.
+CHERELUS Solem
+MORISSET Nherlyse
+ST-PREUX Christine
+"""
+
 import Databases_pack.database as db
 from gestion_des_contraintes.contraintes import banner, afficher_entete, afficher_donnees, is_empty, is_valid_email, is_valid_phone_number, clear_screen, attendre_touche, Person, afficher_texte_progressivement
 '''id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -8,16 +17,17 @@ from gestion_des_contraintes.contraintes import banner, afficher_entete, affiche
                 email TEXT NOT NULL'''
 
 class Gestion_Professeur:
-    """Class contenant toutes les fonctions relative a la gestion des Salles"""
+    """Class contenant toutes les fonctions relative a la gestion des Salles."""
     
     def __init__(self, adm_id):
+        """Methode constructeur pour la classe professeur."""
         self.connection = db.connect_to_database("Gestion_des_salles.db")
         self.adm_id = adm_id
         self.personne = Person()
         db.initialize_conn(self.connection)
         
     def enregistrer(self):
-        """Enregistre un nouveau professeur"""
+        """Enregistre un nouveau professeur."""
         nom = self.personne.f_name()
         if nom.lower() == 'x':
             return   
@@ -43,7 +53,7 @@ class Gestion_Professeur:
                 print(' '*20,"1234567890")      # True
            
     def lister(self):
-        """Lister toutes les salles de la table Professeurs"""
+        """Lister toutes les salles de la table Professeurs."""
         datas = db.read_database(self.connection, "Professeurs")
         if datas:
             print(' '*20,"Voici les informations enregistrées concernant les Professeurs:\n ")
@@ -54,7 +64,7 @@ class Gestion_Professeur:
             print(' '*20,"\nAucun Professeur n'est encore enregistré.\n")
 
     def modifier(self):        
-        """Modifier les infos d'un Professeur"""
+        """Modify les infos d'un Professeur."""
         id_Professeur = is_empty("Entrer le id du Professeur a modifier: ")
         if db.verify_data(self.connection, "Professeurs", "id_prof", id_Professeur) :
             while True:
@@ -121,7 +131,7 @@ class Gestion_Professeur:
             print(' '*20,"Ce professeur n'est pas enregistré dans la base de données.")
 
     def rechercher(self):
-        """filtrer la table Salles"""
+        """Filtrer la table Salles."""
         while True:
             print(' '*20,'-'*32)
             print(' '*20,'-'*8,"MENU RECHERCHER PROFESSEUR",'-'*8)
@@ -183,7 +193,6 @@ class Gestion_Professeur:
                         print(' '*20, f"Suppression des horaires associées au cours: {id_}.")
                         db.delete_database(self.connection, "Horaire", "code_cours", id_)
 
-
                     db.delete_database(self.connection, "Professeurs", "id_prof", prof)
                     print(' '*20,f"Suppression du Professeur {prof} effectuée!")
                     break
@@ -195,8 +204,7 @@ class Gestion_Professeur:
             print(' '*20,"Ce Professeur n'est pas enregistré dans la base de données.")
   
     def menu_professeur (self) :
-        
-        """Fonction affichant les options de gestion des Professeurs"""
+        """Fonction affichant les options de gestion des Professeurs."""
         while True:
             clear_screen()
             banner()

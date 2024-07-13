@@ -1,25 +1,39 @@
+"""Projet final de Python 
+Date de remise: 12 Juillet 2024
+Nom des membres du Groupe:
+BELCEUS Samienove R.
+CHERELUS Solem
+MORISSET Nherlyse
+ST-PREUX Christine
+"""
+
+
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes import is_empty, banner,is_integer, afficher_donnees, afficher_entete,afficher_texte_progressivement, attendre_touche, clear_screen, afficher_texte_progressivement
+from gestion_des_contraintes.contraintes \
+import is_empty, banner,is_integer, afficher_donnees, afficher_entete,afficher_texte_progressivement, attendre_touche, clear_screen
+
 """CREATE TABLE IF NOT EXISTS Salles (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_salle TEXT, 
-                num_salle INTEGER NOT NULL,
-                id_batiment TEXT,
-                etage INTEGER NOT NULL,
-                nombre_de_siege INTEGER NOT NULL, 
-                statut TEXT NOT NULL)
-        """ 
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+id_salle TEXT, 
+num_salle INTEGER NOT NULL,
+id_batiment TEXT,
+etage INTEGER NOT NULL,
+nombre_de_siege INTEGER NOT NULL, 
+statut TEXT NOT NULL)
+""" 
+
 class Gestion_Salle:
-    """Class contenant toutes les fonctions relative a la gestion des Salles"""
-    
+    """Class contenant toutes les fonctions relative a la gestion des Salles."""
+
     def __init__(self, adm_id):
+        """Methode constructeur pour la classe Salles."""
         self.connection = db.connect_to_database("Gestion_des_salles.db")
         self.adm_id = adm_id
         db.initialize_conn(self.connection)
-        
+
     def enregistrer(self):
-        """Enregistre une nouvelle salle"""
-        while True: 
+        """Enregistre une nouvelle salle."""
+        while True:
             print(' '*20,"Entrer le nom/id du batiment dans lequel se trouve la salle:")
             batiment = is_empty("(x pour quitter)")
             if batiment == 'x':
@@ -39,8 +53,9 @@ class Gestion_Salle:
                         else:
                             while True:
                                 print(' '*20,f"voici les numeros de salle pour cette étage:")
-                                numero_salles =  [f'{num_etage}01' ,f'{num_etage}02', f'{num_etage}03', f'{num_etage}04', f'{num_etage}05', f'{num_etage}06'] 
-                                print(' '*20,f'{num_etage}01' ,f'\t{num_etage}02', f'\t{num_etage}03')
+                                numero_salles =  [f'{num_etage}01' ,\
+                                f'{num_etage}02', f'{num_etage}03', f'{num_etage}04', f'{num_etage}05', f'{num_etage}06']
+                                print(' '*20,f'{num_etage}01', f'\t{num_etage}02', f'\t{num_etage}03')
                                 print(' '*20,f'{num_etage}04', f'\t{num_etage}05', f'\t{num_etage}06')
                                 print(' '*20,"Choisir le numero de la salle[1-6]:")
                                 numero_salle = is_empty("(x pour quitter)").lower()
@@ -48,7 +63,7 @@ class Gestion_Salle:
                                     return
                                 elif numero_salle in numero_salles:
                                     break
-                                else: 
+                                else:
                                     print(' '*20,"Le numéro de la salle doit être dans la liste proposée.\n")
                             break
                     else:
@@ -61,22 +76,26 @@ class Gestion_Salle:
                     while True:
                         try:
                             sieges = int(is_empty("Entrer le nombre de sieges de la salle:"))
-                        except Exception as e:
+                        except TypeError as e:
                             print("L'entrée doit être un entier: ",e)
                         else:
                             if sieges < 0 or sieges > 70:
-                                print(' '*20,"Le nombre de sieges doit logiquement etre compris entre 0 et 70 maximum.")
+                                print(' '*20,"Le nombre de sieges doit etre compris entre 0 et 70 maximum.")
                             else:
-                                db.insert_data(self.connection, "Salles",num_salle= int(numero_salle), id_batiment = batiment.upper(), etage = int(num_etage), nombre_de_siege = sieges)
+                                db.insert_data(self.connection, "Salles",\
+                                num_salle = int(numero_salle), id_batiment = batiment.upper(), \
+                                    etage = int(num_etage), nombre_de_siege = sieges)
                                 # incrementer le nombre de salle du batiment
                                 datas_batiment= db.search_by_data(self.connection, "Batiments", "id_batiment", batiment)
-                                db.update_data(self.connection, "Batiments", "id_batiment", batiment.upper(), salle_de_cours = (datas_batiment[0][3] + 1))
+                                db.update_data(self.connection, "Batiments", \
+                                            "id_batiment", batiment.upper(), salle_de_cours = (datas_batiment[0][3] + 1))
                                 break
                     break
             else:
                 while True:
                     print(' '*20,f"Le Batiment {batiment} n'est pas enregistré dans la table Batiment.")
-                    print(' '*20,"Veuillez d'abord l'enregistrer dans le menu 'batiment' pour pouvoir enregistrer la salle.\n")
+                    print(' '*20,"Veuillez d'abord l'enregistrer dans le menu 'batiment' \
+                          pour pouvoir enregistrer la salle.\n")
                     ch = is_empty("1- Reessayer\t 2-Abandonner l'enregistrement")
                     if ch == "1":
                         break
@@ -86,9 +105,8 @@ class Gestion_Salle:
                         print(' '*20,"Vous devez choisir entre 1 et 2.")
         attendre_touche()
 
-        
     def lister(self):
-        """Lister toutes les salles de la table Salles"""
+        """Lister toutes les salles de la table Salles."""
         datas = db.read_database(self.connection, "Salles")
         if datas:
             print(' '*20,"Voici les informations enregistrées concernant les Salles:\n ")
@@ -98,15 +116,14 @@ class Gestion_Salle:
         else:
             print('\n', ' '*20,"Aucune salle n'est encore enregistrée.\n")
         attendre_touche()
-   
-    def modifier(self):        
-        """Modifier les infos d'une salle"""
-        print(' '*20,"Entrer le id de la salle a modifier:")       
+
+    def modifier(self):
+        """Modify les infos d'une salle."""
+        print(' '*20,"Entrer le id de la salle a modifier:")  
         id_salle = is_empty("(x pour quitter):").upper()
         if id_salle == 'X':
             return
-
-        elif db.verify_data(self.connection, "Salles", "id_salle", id_salle) :
+        if db.verify_data(self.connection, "Salles", "id_salle", id_salle) :
                 text = "\t\tPour éviter des conflits entre les données, "
                 text2 = "\tvous avez seulement l'accès de modifier le nombre de sièges d'une salle. "
                 afficher_texte_progressivement(text, 0.01)
@@ -115,7 +132,7 @@ class Gestion_Salle:
                 while True:
                     try:
                         sieges = int(is_empty("Entrer le nombre de sieges de la salle:"))
-                    except Exception as e:
+                    except TypeError as e:
                         print(' '*20,"Entree invalide: ",e)
                     else:
                         if sieges < 0 or sieges > 70:
@@ -128,7 +145,7 @@ class Gestion_Salle:
             print(' '*20,"Cette salle n'est pas enregistré dans la base de données.")
 
     def rechercher(self):
-        """filtrer la table Salles"""
+        """Filtrer la table Salles."""
         while True:
             print(' '*20,'\t','-'*8,"MENU RECHERCHER SALLE",'-'*8)
             print(' '*20,'\t','-'*32)
@@ -141,13 +158,13 @@ class Gestion_Salle:
             print(' '*20,"6- Retour au menu Salle.")
             print(' '*20,"7- Quitter le programme. ")
             choix = is_empty("Faites votre choix:")
-            
+
             if choix == '1':
                 print(' '*20,"Entrer l'id de la salle a afficher:")
                 room_id = is_empty("(x pour quitter)").upper()
                 if room_id == 'X':
                     return
-                elif db.verify_data(self.connection, "Salles", "id_salle", room_id) == True:
+                if db.verify_data(self.connection, "Salles", "id_salle", room_id) == True:
                     print()
                     print(' '*20, f"Voici les informations la salles {room_id}.\n")
                     datas = db.search_by_data(self.connection, "Salles","id_salle", room_id)
@@ -170,16 +187,15 @@ class Gestion_Salle:
                     print(' '*20,f"Aucun batiment ne contient {numero_salle} salle(s).")
                 attendre_touche()
                 clear_screen()
-            
+
             elif choix == '3':
                 while True:
                     try:
                         num_etage = is_empty("Entrer l'étage: (x pour quitter)").lower()
                         if num_etage == 'x':
                             return
-                        else:
-                            num_etage = int(num_etage)
-                    except Exception as e:
+                        num_etage = int(num_etage)
+                    except TypeError as e:
                         print(' '*20,"L'entrée doit être un entier: ", e)
                     else:
                         if num_etage< 1 or num_etage > 3:
@@ -200,14 +216,14 @@ class Gestion_Salle:
                 id_batiment = is_empty("(x pour quitter)").upper()
                 if id_batiment == "X":
                     return
-                elif db.verify_data(self.connection, "Salles","id_batiment", id_batiment):
+                if db.verify_data(self.connection, "Salles","id_batiment", id_batiment):
                     datas = db.search_by_data(self.connection, "Batiments", "id_batiment", id_batiment)
                     if datas:
                         print(' '*20,f"Voici les informations des salles se trouvant au batiment {id_batiment}.\n")
                         columns = ['Index', 'Salles', 'numéro','batiment','étage', 'nombre de sièges']
                         largeur, separateur = afficher_entete(columns)
                         afficher_donnees(datas, largeur, separateur)
-                        
+
                 else:
                     print(' '*20,"Ce batiment n'est pas enregistré dans la base de donnée.")
                 attendre_touche()
@@ -216,7 +232,7 @@ class Gestion_Salle:
                 while True:
                     try:
                         sieges = int(is_empty("Entrer le nombre de siège[0 -70]: "))
-                    except Exception as e:
+                    except TypeError as e:
                         print(' '*20,"L'entrée doit être un entier: ", e)
                     else:
                         if sieges< 0 or sieges > 70:
@@ -244,11 +260,12 @@ class Gestion_Salle:
                 print(' '*20,"Entrée invalide, Veuillez choisir entre les options proposées.")
 
     def supprimer(self):
+        """Methode permettant de supprimer une salle."""
         print(' '*20,"Entrer l'id de la salle a supprimer:")
         id_salle = is_empty("(x pour quitter)").upper()
         if id_salle == 'X':
             return
-        elif db.verify_data(self.connection, "Salles", "id_salle", id_salle):
+        if db.verify_data(self.connection, "Salles", "id_salle", id_salle):
             while True: 
                 Warning_= f"\t\t\t\tATTENTION!\n"
                 Warning_1 = f"La supression de la salle {id_salle} va entrainer la supression de toutes les horaires pour les cours qui y sont programmés.\n"
@@ -277,14 +294,13 @@ class Gestion_Salle:
                     break
                 elif choix == '2':
                     return
-                else:
-                    print(' '*20,"Vous devez choisir entre les options 1 et 2.")
+                print(' '*20,"Vous devez choisir entre les options 1 et 2.")
         else:
             print(' '*20,"Cette salle n'est pas enregistrée dans la base de données.")
         attendre_touche()
-  
+
     def menu_salle (self) :
-        """Fonction affichant les options de gestion des Salles"""
+        """Fonction affichant les options des Salles."""
         while True:
             clear_screen()
             banner()
@@ -302,7 +318,7 @@ class Gestion_Salle:
             print(' '*20,"7- Quitter le programme.")
             try:
                 choix = int(is_empty("Veuillez choisir votre option.[1-7]:"))
-            except Exception as e:
+            except TypeError as e:
                 print("Erreur veuiller entrer un entier valide: ", e)
             else:
                 if choix < 1 or choix > 7:
@@ -345,4 +361,3 @@ class Gestion_Salle:
                             print("\n",' '*20,"Fermeture du programme...\n")
                             attendre_touche()
                             exit() 
-                    

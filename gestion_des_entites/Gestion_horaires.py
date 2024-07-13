@@ -1,28 +1,31 @@
 """CREATE TABLE IF NOT EXISTS Horaire (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                code_cours TEXT NOT NULL,
-                code_salle TEXT NOT NULL,
-                jour TEXT NOT NULL,
-                heure_debut INTEGER NOT NULL,
-                heure_fin INTEGER NOT NULL,
-                session INTEGER NOT NULL,
-                annee INTEGER NOT NULL)
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+code_cours TEXT NOT NULL,
+code_salle TEXT NOT NULL,
+jour TEXT NOT NULL,
+heure_debut INTEGER NOT NULL,
+heure_fin INTEGER NOT NULL,
+session INTEGER NOT NULL,
+annee INTEGER NOT NULL
+)
 """
+
 """Ce module contient les codes de gestions des horaires."""
+
 import Databases_pack.database as db
 from gestion_des_contraintes.contraintes import *
 
 class Gestion_Horaire:
-    """Cette class gère les codes de gestions des horaires."""
+    """Cette classe gère les codes de gestions des horaires."""
     
     def __init__(self, adm_id):
+        """Methode constructeur pour la classe horaire."""
         self.connection_db = db.connect_to_database("Gestion_des_salles.db")
         self.adm_id = adm_id
         db.initialize_conn(self.connection_db)
         
     def enregistrer(self):
-        """enregistre un cours dans l'horaire"""
-
+        """Enregistre un cours dans l'horaire."""
         #recuperation du cours
         while True:
             print('\n', ' '*20,"entrer l'id du cours a enregistrer dans l'horaire:")
@@ -184,7 +187,7 @@ class Gestion_Horaire:
                 db.insert_data(self.connection_db, "Horaire", code_cours = cours, nom_cours = cours_datas[0][2], code_salle = salle, jour = jour, heure_debut = debut, heure_fin = heure_finale, session = session, annee = annee)
 
     def modifier(self):        
-        """Modifier les infos d'un Professeur"""
+        """Modify les infos d'un Professeur."""
         id_horaire = is_empty("Entrer le id de l'horaire a modifier:(x pour quitter) ").lower()
         if id_horaire == 'x':
             return
@@ -394,7 +397,7 @@ class Gestion_Horaire:
         attendre_touche()
 
     def lister(self):
-        """Lister toutes les informations enregistreees dans l'horaire"""
+        """Lister toutes les informations enregistrees dans l'horaire."""
         datas = db.read_database(self.connection_db, "Horaire")
         if datas:
             print(' '*20,"\tVoici les cours programmés dans l'horaire:\n ")
@@ -406,7 +409,7 @@ class Gestion_Horaire:
             print("\n",' '*20,"Aucun cours n'est encore enregistré dans l'horaire.\n")
 
     def rechercher(self):
-        """filtrer la table Salles"""
+        """Filtrer la table Salles."""
         while True:
             clear_screen()
             banner()
@@ -554,7 +557,7 @@ class Gestion_Horaire:
             print(' '*20,"Cette id d'horaire n'est pas enregistré dans la base de données.")
   
     def menu_horaire (self) :
-        """Fonction affichant les options de gestion des Professeurs"""
+        """Fonction affichant les options de gestion des Professeurs."""
         while True:
             clear_screen()
             banner()
