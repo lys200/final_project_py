@@ -373,8 +373,7 @@ def afficher_horaires(conn, faculte=None, niveau=None, id_prof=None):
     # Exécuter la requête et récupérer les résultats
     cursor.execute(query, params)
     return cursor.fetchall()
-    
-    
+        
 def afficher_horaire(conn):
     """Fonction qui formatte l'affichage de tous les horaires 
     param conn: connection a la base de donnee
@@ -394,6 +393,7 @@ def afficher_horaire(conn):
     jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
     heures = [f'{h:02}:00' for h in range(8, 17)]
     column_width = 15
+    
     # Organisation des données par année, session, niveau, et faculté
     horaires = {}
     for row in rows:
@@ -405,6 +405,7 @@ def afficher_horaire(conn):
         
         heure_debut_int = int(heure_debut.split(':')[0])
         heure_fin_int = int(heure_fin.split(':')[0])
+        
         for heure in range(heure_debut_int, heure_fin_int + 1):
             heure_str = f'{heure:02}:00'
             if heure_str in horaires[key] and jour in horaires[key][heure_str]:

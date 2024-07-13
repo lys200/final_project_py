@@ -56,7 +56,6 @@ class Gestion_Salle:
                 idsalle = f'{batiment.upper()}{numero_salle}'
                 if db.verify_data(self.connection,'Salles','id_salle', idsalle):
                     print(' '*20,"Cette salle est deja enregistrée dans la base de donnée.")
-                    attendre_touche()
                     break
                 else:
                     while True:
@@ -86,6 +85,8 @@ class Gestion_Salle:
                         return
                     else:
                         print(' '*20,"Vous devez choisir entre 1 et 2.")
+        attendre_touche()
+
         
     def lister(self):
         """Lister toutes les salles de la table Salles"""
@@ -174,12 +175,16 @@ class Gestion_Salle:
             elif choix == '3':
                 while True:
                     try:
-                        num_etage = int(is_empty("Entrer l'étage:\n -->"))
+                        num_etage = is_empty("Entrer l'étage: (x pour quitter)").lower()
+                        if num_etage == 'x':
+                            return
+                        else:
+                            num_etage = int(num_etage)
                     except Exception as e:
                         print(' '*20,"L'entrée doit être un entier: ", e)
                     else:
-                        if num_etage< 0 or num_etage > 2:
-                            print(' '*20,"Le numéro d'étage va de 0 a 2.")
+                        if num_etage< 1 or num_etage > 3:
+                            print(' '*20,"Le numéro d'étage va de 1 a 3.")
                         else:
                             datas = db.search_by_data(self.connection, "Salles","etage", num_etage )
                             if not datas:
@@ -197,7 +202,7 @@ class Gestion_Salle:
                 if id_batiment == "X":
                     return
                 elif db.verify_data(self.connection, "Salles","id_batiment", id_batiment):
-                    datas = db.search_by_data(self.connection, "Batiment", "id_batiment", id_batiment)
+                    datas = db.search_by_data(self.connection, "Batiments", "id_batiment", id_batiment)
                     if datas:
                         print(' '*20,f"Voici les informations des salles se trouvant au batiment {id_batiment}.\n")
                         columns = ['Index', 'Salles', 'numéro','batiment','étage', 'nombre de sièges']
@@ -284,16 +289,16 @@ class Gestion_Salle:
         while True:
             clear_screen()
             banner()
-            print(' '*20,'-'*32,'\n')        
-            print(' '*20,'-'*8,"MENU SALLE",'-'*8)
+            print(' '*20,'-'*32)        
+            print(' '*22,'-'*8,"MENU SALLE",'-'*8)
             print(' '*20,'-'*32)        
             print(' '*20,"Bienvenue au menu Salles.\n")
             print(' '*20,"Veuillez choisir votre option.")
-            print(' '*20,"1- Enregistrer une salle.")
+            print(' '*20,"1- Enregistrer une salle[admin].")
             print(' '*20,"2- Lister les salles.")
             print(' '*20,"3- Rechercher une/des salle(s).")
-            print(' '*20,"4- Modifier les informations d'une salle.")
-            print(' '*20,"5- Supprimer une salle.")
+            print(' '*20,"4- Modifier les informations d'une salle [admin].")
+            print(' '*20,"5- Supprimer une salle[admin].")
             print(' '*20,"6- Retour au menu principal.")
             print(' '*20,"7- Quitter le programme.")
             try:
@@ -324,17 +329,21 @@ class Gestion_Salle:
                     else:
                         if choix == 1:
                             print(' '*20,"Accès interdit. Seuls les admins peuvent faire des enregistrements.\n")
+                            attendre_touche()
                         elif choix == 2:
                             self.lister()
                         elif choix == 3:
                             self.rechercher()
                         elif choix == 4:
                             print(' '*20,"Accès interdit. Seuls les admins peuvent faire des modifications.\n")
+                            attendre_touche()
                         elif choix == 5:
                             print(' '*20,"Accès interdit. Seuls les admins peuvent faire des suppressions.\n")
+                            attendre_touche()
                         elif choix == 6:
                             break  
                         else:
                             print("\n",' '*20,"Fermeture du programme...\n")
                             attendre_touche()
                             exit() 
+                    

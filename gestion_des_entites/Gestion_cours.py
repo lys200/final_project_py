@@ -8,7 +8,7 @@
 """
 import Databases_pack.database as db
 from gestion_des_contraintes.contraintes import is_empty,attendre_touche,\
-    verifier_format_heure_v2, display_list_columns, afficher_texte_progressivement , afficher_entete, afficher_donnees
+    verifier_format_heure_v2, banner, clear_screen, afficher_texte_progressivement , afficher_entete, afficher_donnees
 """CREATE TABLE IF NOT EXISTS Cours (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_cours TEXT,
@@ -131,7 +131,6 @@ class Gestion_Cours:
             largeur, separateur = afficher_entete(columns)
             afficher_donnees(datas, largeur, separateur)
             
-
     def modifier(self):        
         """Modifier les infos d'un cours"""
         id_cours = is_empty("Entrer le id du cours a modifier (x pour quitter):")
@@ -216,8 +215,9 @@ class Gestion_Cours:
     def rechercher(self):
         """filtrer la table cours"""
         while True:
+            clear_screen()
+            banner()
             print(' '*20,'-'*8,"MENU RECHERCHER COURS",'-'*8)
-            print(' '*20,'-'*32)
             print(' '*20,"Pour faire une recherche par filtre , vous devez choisir entre les parmi options suivantes: ")
             print(' '*20,"1- Rechercher un Cours par son id.")
             print(' '*20,"2- Afficher les cours par nom.")
@@ -288,7 +288,7 @@ class Gestion_Cours:
             elif choix == '5':
                 while True:
                     prof = is_empty("Entrer l'id du professeur dont vous vouller afficher les cours (x pour quitter): ")
-                    if prof == 'x':
+                    if prof.lower() == 'x':
                         break
                     elif db.verify_data(self.curseur, "Cours", "id_prof", prof):
                         print (' '*20,f"\t\tLes cours du niveau {prof} sont les suivants: ")
@@ -298,7 +298,6 @@ class Gestion_Cours:
                         afficher_donnees(datas, largeur, separateur)
                         break
                     else: 
-            
                         print(' '*20,f"Aucun cours n'est enseigné pas le prof {prof}.")
             
             elif choix == '6':
@@ -321,7 +320,7 @@ class Gestion_Cours:
                         else:
                             while True:
                                 print(' '*20,"Format d'heure invalide.")
-                                ch = input("1- réessayer         2- abandonner la recherche")
+                                ch = is_empty("1- réessayer         2- abandonner la recherche")
                                 if ch == '1':
                                     break
                                 elif ch == '2':
@@ -338,6 +337,7 @@ class Gestion_Cours:
 
             else:
                 print(' '*20,"Entrée invalide, Veuillez choisir entre les options proposées.")
+            attendre_touche()
 
     def supprimer(self):
         """Supprime un cours, et toutes ses occurences dans les autres tables."""

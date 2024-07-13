@@ -130,6 +130,7 @@ class Gestion_Batiment:
             else:
                 print(' '*20, "Vous devez choisir entre 1 a 5.")
             attendre_touche()
+    
     def supprimer(self):
         print(' '*20,"Entrer l'id du Batiment a supprimer:")
         id_batiment = is_empty("(x pour quitter)").upper()

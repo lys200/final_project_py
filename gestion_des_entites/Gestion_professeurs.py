@@ -1,5 +1,5 @@
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes import afficher_entete, afficher_donnees, is_empty, is_valid_email, is_valid_phone_number, display_list_columns, Person, afficher_texte_progressivement
+from gestion_des_contraintes.contraintes import banner, afficher_entete, afficher_donnees, is_empty, is_valid_email, is_valid_phone_number, clear_screen, attendre_touche, Person, afficher_texte_progressivement
 '''id INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_prof TEXT PRYMARY KEY, 
                 nom_prof TEXT NOT NULL,
@@ -33,7 +33,7 @@ class Gestion_Professeur:
                 return
             elif is_valid_phone_number(tel):
                 db.insert_data(self.connection, "Professeurs", nom_prof = nom, prenom_prof = prenom, tel_prof = tel, email = email)
-                print(' '*20,f"Le professeur {nom} {prenom} est enregistré avec succès.")
+                print(' '*20, f"Le professeur {nom} {prenom} est enregistré avec succès.")
                 break
             else:
                 print(' '*20,"Telephone invalide. Exemple de formats valide:")
@@ -47,7 +47,7 @@ class Gestion_Professeur:
         datas = db.read_database(self.connection, "Professeurs")
         if datas:
             print(' '*20,"Voici les informations enregistrées concernant les Professeurs:\n ")
-            placeholders = ['indexes','id','nom' ,"prenom" ,'tel' ,'email']
+            placeholders = ['indexes','id du prof','nom du Prof' ,"prenom du prof" ,'telephone    ' ,'email du prof                  ']
             largeur, separateur = afficher_entete(placeholders)
             afficher_donnees(datas, largeur, separateur)
         else:
@@ -102,7 +102,7 @@ class Gestion_Professeur:
                             print(' '*20,"1234567890")      # True
                 elif choix == '4':
                     while True:
-                        email = self.personne.email()
+                        email = self.personne.mail()
                         if email.lower() == 'x':
                             return
                         elif is_valid_email(email):
@@ -110,7 +110,7 @@ class Gestion_Professeur:
                             print(' '*20,"Mise a jour effectuée")
                             break
                         else:
-                            print(' '*20,"Email invalide.\nExemple: something@domain.com")
+                            print(' '*20,"Email invalide. (Exemple: something@domain.com)")
                 elif choix == '5':
                     break #or return
                 elif choix == '6':
@@ -136,7 +136,7 @@ class Gestion_Professeur:
                 prof = is_empty("Entrer l'id du professeur a afficher: ")
                 if db.verify_data(self.connection, "Professeurs", "id_prof", prof) == True:
                     datas = db.search_by_data(self.connection, "Professeurs","id_prof", prof)
-                    placeholders = ['indexes','id','nom' ,"prenom" ,'tel' ,'email']
+                    placeholders = ['indexes','id du prof','nom du Prof' ,"prenom du prof" ,'telephone    ' ,'email du prof                  ']
                     largeur, separateur = afficher_entete(placeholders)
                     afficher_donnees(datas, largeur, separateur)
                 else:
@@ -195,22 +195,25 @@ class Gestion_Professeur:
             print(' '*20,"Ce Professeur n'est pas enregistré dans la base de données.")
   
     def menu_professeur (self) :
+        
         """Fonction affichant les options de gestion des Professeurs"""
         while True:
-            print('\n\t','-'*32)        
-            print('\t','-'*8,"MENU PROFESSEUR",'-'*8)
-            print('\t','-'*32,'\n')        
+            clear_screen()
+            banner()
+            print(' '*20,'-'*32)        
+            print(' '*20,'-'*8,"MENU PROFESSEUR",'-'*7)
+            print(' '*20,'-'*32,'\n')        
             print(' '*20,"Bienvenue au menu des professeurs.")
             print(' '*20,"Veuillez choisir votre option.")
-            print(' '*20,"1- Enregistrer un Professeur.")
+            print(' '*20,"1- Enregistrer un Professeur[admin].")
             print(' '*20,"2- Lister les professeurs.")
             print(' '*20,"3- Rechercher un Professeur.")
-            print(' '*20,"4- Modifier les informations d'un Professeur.")
-            print(' '*20,"5- Supprimer un Professeur.")
+            print(' '*20,"4- Modifier les informations d'un Professeur[admin].")
+            print(' '*20,"5- Supprimer un Professeur[admin].")
             print(' '*20,"6- Retour au menu principal.")
             print(' '*20,"7- Quitter le programme.")
             try:
-                choix = int(input("Veuillez choisir votre option.[1-7]: "))
+                choix = int(is_empty("Veuillez choisir votre option.[1-7]: "))
             except Exception as e:
                 print(' '*20,"Erreur veuiller entrer un entier valide: ", e)
             else:
@@ -220,32 +223,45 @@ class Gestion_Professeur:
                     if self.adm_id :
                         if choix == 1:
                             self.enregistrer()
+                            attendre_touche()
                         elif choix == 2:
                             self.lister()
+                            attendre_touche()
                         elif choix == 3:
                             self.rechercher()
+                            attendre_touche()
                         elif choix == 4:
                             self.modifier()
+                            attendre_touche()
                         elif choix == 5:
                             self.supprimer()
+                            attendre_touche()
                         elif choix == 6:
                             break  
                         else:
                             print(' '*20,"\n\tFermeture du programme...\n")
+                            attendre_touche()
                             exit() 
                     else:
                         if choix == 1:
                             print(' '*20,"Accès interdit. Seuls les admins peuvent faire des enregistrements.\n")
+                            attendre_touche()
                         elif choix == 2:
                             self.lister()
+                            attendre_touche()
                         elif choix == 3:
                             self.rechercher()
+                            attendre_touche()
                         elif choix == 4:
                             print(' '*20,"Accès interdit. Seuls les admins peuvent faire des modifications.\n")
+                            attendre_touche()
                         elif choix == 5:
                             print(' '*20,"Accès interdit. Seuls les admins peuvent faire des suppressions.\n")
+                            attendre_touche()
                         elif choix == 6:
                             break  
                         else:
-                            print(' '*20,"\n\tFermeture du programme...\n")
-                            exit()  
+                            print(' '*20,"Fermeture du programme...\n")
+                            attendre_touche()
+                            exit()
+                    

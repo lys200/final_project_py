@@ -67,7 +67,7 @@ def menu_pricipal(adm_id):
 def main():
     """Fonction principale contenant les fonctionnalites basiques du systeme"""
     texte_bienvenue = """Bienvenue dans notre projet de gestion des salle du CHCL.\n
-        il est recommané de lancer le programme dans une console pour une meilleure experience. """
+        il est recommandé de lancer le programme dans une console pour une meilleure experience. """
     clear_screen()
     afficher_texte_progressivement(texte_bienvenue, 0.01)
     attendre_touche()

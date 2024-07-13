@@ -112,7 +112,7 @@ class Gestion_Horaire:
                         while True:
                             print(' '*20,"l'heure de fin ne doit pas exceder 16h, car c'est l'heure de fin des cours.")
                             print(' '*20,f" la duree du cours de {data[2]} est de {duree} h. CHoisissez le du debut en consequence.")
-                            print(' '*20,"voulez vous reassayer?")
+                            print(' '*20,"voulez-vous réessayer?")
                             ch = is_empty("1-oui\t2-abandonner")
                             if ch == '1':
                                 break
@@ -161,7 +161,9 @@ class Gestion_Horaire:
         while True:
             print('\n',' '*20,"Entrer la session pour laquelle vous enregistrez le cours dans l'horaire")
             session = is_empty("(x pour quitter)")
-            if session == '1' or session == '2':   
+            if session == 'x':
+                return
+            elif session == '1' or session == '2':   
                 session = int(session)             
                 break
             else:
@@ -176,6 +178,177 @@ class Gestion_Horaire:
             else:
                 db.insert_data(self.connection_db, "Horaire", code_cours = cours, nom_cours = cours_datas[0][2], code_salle = salle, jour = jour, heure_debut = debut, heure_fin = heure_finale, session = session, annee = annee)
 
+    def modifier(self):        
+        """Modifier les infos d'un Professeur"""
+        id_horaire = is_empty("Entrer le id de l'horaire a modifier:(x pour quitter) ").lower()
+        if id_horaire == 'x':
+            return
+        if db.verify_data(self.connection_db, "Horaire", "id", id_horaire) :
+            datas_h = db.search_by_data(self.connection_db, "Horaire", "id", id_horaire)
+            print(datas_h)
+            while True:
+                attendre_touche()
+                clear_screen()
+                banner()
+                print(' '*20,'-'*8,"MENU MODIFIER Horaire",'-'*8)
+                print(' '*20,'-'*32)
+                print()
+                print(' '*20,"Veuillez choisir parmi les options de modification suivantes: ")
+                print(' '*20,"1- Modifier la salle.")
+                print(' '*20,"2- Modifier le jour du cours.")
+                print(' '*20,"3- Modifier l'heure de debut du cours")
+                print(' '*20,"4- Modifier la session")
+                print(' '*20,"5- Modifier l'année")
+                print(' '*20,"6- Retour au menu Horaire.")
+                print(' '*20,"7- Quitter le programme. ")
+
+                choix = is_empty("Faites votre choix:")
+                if choix == '1':
+                    while True:
+                        salle = is_empty("Entrer la nouvelle salle (x pour quitter): ")
+                        if salle == 'x':
+                            return  
+                        elif db.verify_data(self.connection_db, "Salles", "id_salle", salle):
+                            if db.verifier_conflit(self.connection_db, datas_h[0][4], datas_h[0][7], datas_h[0][8], datas_h[0][5], datas_h[0][6], salle):
+                                db.update_data(self.connection_db, "Horaire", "id", id_horaire, code_salle = salle) 
+                                print(' '*20,"Mise a jour effectuée")
+                            else:
+                                print(' '*20,f"Impossible de modifier l'horaire {id_horaire} pour la salle {salle}", 
+                                        ' '*20, "car un autre cours de déroule dans cette salle.")
+                        else:
+                            while True:
+                                print(' '*20, "cette salle n'existe pas dans la base de données.")
+                                print(' '*20, "1- Réessayer\t\t 2- Abandonner la modification")
+                                ch = is_empty("Faites votre choix: ")
+                                if ch == '1':
+                                    break
+                                if ch == '2':
+                                    self.modifier()
+                                else:
+                                    print(' '*20, "Vous devez choisir entre 1 et 2.")
+              
+                if choix == '2':
+                    while True:
+                        jour = is_empty("Entrer le nouveau jour du cours (x pour quitter): ").lower()
+                        if jour == 'x':
+                            return  
+                        elif jour in ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']:
+                            if db.verifier_conflit(self.connection_db,jour, datas_h[0][7], datas_h[0][8], datas_h[0][5], datas_h[0][6], datas_h[0][3]):
+                                db.update_data(self.connection_db, "Horaire", "id", id_horaire, code_salle = salle) 
+                                print(' '*20,"Mise a jour effectuée")
+                            else:
+                                print(' '*20,f"Impossible de modifier l'horaire {id_horaire} pour {jour}", 
+                                        ' '*20, "car un autre cours de déroule dans cette salle ce jour et a la meme heure.")
+                        else:
+                            while True:
+                                print(' '*20, "Vous devez entrer un jour de la semaine(sauf dimanche).")
+                                print(' '*20, "1- réessayer\t\t 2- Abandonner la modification")
+                                ch = is_empty("Faites votre choix: ")
+                                if ch == '1':
+                                    break
+                                if ch == '2':
+                                    self.modifier()
+                                else:
+                                    print(' '*20, "Vous devez choisir entre 1 et 2.")
+              
+                if choix == '3':
+                    while True:
+                        print(' '*20,"Entrer la nouvelle heure de début du cours(HH:MM format 24h):")
+                        debut = is_empty("(x pour quitter)")
+                        if debut.lower() ==  'x':
+                            return
+                        elif verifier_format_heure_v2(debut):
+                            if verifier_plage_horaire(debut):
+                                #heure de la fin est généré automatiquement a partir de la duree du cours
+                                # generer la duree du cours
+                                heure_h, minute_m = map(int, datas_h[0][5].split(':'))
+                                heure1 = heure_h * 60 + minute_m
+                                heure_h, minute_m = map(int, datas_h[0][6].split(':'))
+                                heure2 = heure_h * 60 + minute_m
+
+                                duree = heure2 - heure1
+                                print (duree)
+                                duree_str = f"0{duree//60}:{duree%60}"
+                                #separer les heures des mns pour la duree
+                                # h1, m1 = map(int, duree.split(':'))
+                                h1 = duree // 60
+                                m1 = duree % 60
+                                print(h1, m1)                                #separer les heures des mns pour l'heure du debut
+                                h2, m2 = map(int, debut.split(':'))
+                                print(h2, m2)
+
+                                #additionne les minutes
+                                tot_minutes = m1+ m2
+                                heure_additionnelles =  tot_minutes // 60
+                                minutes_residuelles = tot_minutes % 60
+
+                                tot_heures = h1 + h2 + heure_additionnelles
+
+                                #ajuster l'heure finale au cas ou elle depasserait 24h bien qu'elle ne devrait pas
+                                tot_heures = tot_heures % 24
+
+                                heure_finale =  f"{tot_heures}:{minutes_residuelles}"
+                                print(' '*20,f"L'heure finale est automatiquement générée--> {heure_finale}")
+                                if verifier_plage_horaire(heure_finale):
+                                    if db.verifier_conflit(self.connection_db, datas_h[0][4], datas_h[0][7], datas_h[0][8], debut, heure_finale, datas_h[0][3]):
+                                        print(' '*20,f"Il y a conflit entre l'horaire du cours {datas_h[0][1]} et celle d'un autre cours, veuillez consulter l'horaire puis reassayer")
+                                    else:
+                                        db.update_data(self.connection_db, "Horaire", "id", id_horaire, heure_debut= debut)
+                                        print(' '*20, "Modification effectuée!")
+                                        break
+                                else:
+                                    while True:
+                                        print(' '*20,"l'heure de fin ne doit pas exceder 16h, car c'est l'heure de fin des cours.")
+                                        print(' '*20,f" la durée du cours de {datas_h[1]} est de {duree} h. Choisissez l'heure du début en conséquence.")
+                                        print(' '*20,"voulez-vous réessayer?")
+                                        ch = is_empty("1-oui\t2-non")
+                                        if ch == '1':
+                                            break
+                                        elif ch == '2':
+                                            self.modifier()
+                                        else:
+                                            print(' '*20,'Choisissez entre 1 et 2')
+
+                            else:
+                                while True:
+                                    print(' '*20,"L'heure doit etre comprise entre 8:00 et 16:00.")
+                                    ch = is_empty("1-Réessayer\t2- Abandonner la modification")
+                                    if ch == '1':
+                                        break
+                                    elif ch == '2':
+                                        return
+                                    else:
+                                        print(' '*20,'Choisissez entre 1 et 2')
+                        else:
+                            while True:
+                                print("Format d'heure invalide.")
+                                print("1- Réessayer         2- Abandonner la modification")
+                                ch = input(" --> ")
+                                if ch == '1':
+                                    pass
+                                elif ch == '2':
+                                    self.modifier()
+                                else:
+                                    print('Choisissez entre 1 et 2')
+
+                if choix == '4':
+                    while True:
+                        print('\n',' '*20,"Entrer la nouvelle session:")
+                        session = is_empty("(x pour quitter):")
+                        if session == 'x':
+                            return
+                        elif session == '1' or session == '2':   
+                            session = int(session)             
+                            
+                        else:
+                            print(' '*20,"la session doit etre 1 ou 2")
+
+
+               
+                    
+        else:
+            print("Cette horaire n'est pas enregistrée dans la base de données.")
+
     def lister(self):
         """Lister toutes les informations enregistreees dans l'horaire"""
         datas = db.read_database(self.connection_db, "Horaire")
@@ -189,74 +362,6 @@ class Gestion_Horaire:
         else:
             print("\n",' '*20,"Aucun cours n'est encore enregistré dans l'horaire.\n")
 
-    # def modifier(self):        
-    #     """Modifier les infos d'un Professeur"""
-    #     id_horaire = is_empty("Entrer le id de l'horaire a modifier: ")
-    #     if db.verify_data(self.connection_db, "Horaire", "id", id_horaire) :
-    #         while True:
-    #             print('\t','-'*8,"MENU MODIFIER Horaire",'-'*8)
-    #             print('\t','-'*32)
-    #             print("Veuillez choisir parmi les options de modification suivantes: ")
-    #             print("1- Modifier la salle.")
-    #             print("2- Modifier le jour du cours.")
-    #             print("3- Modifier l'heure de debut du cours")
-    #             print("4- Modifier la session")
-    #             print("5- Modifier l'annee")
-    #             print("6- Retour au menu Horaire.")
-    #             print("7- Quitter le programme. ")
-
-    #             choix = is_empty("Faites votre choix:")
-    #             if choix == '1':
-    #                 salle = is_empty("Entrer la nouvelle salle (x pour quitter): ")
-    #                 if salle == 'x':
-    #                     return  
-    #                 else:
-    #                     db.update_data(self.connection_db, "Professeurs", "id_prof", id_Professeur,  nom_prof = nom) 
-    #                     print("Mise a jour effectuée")
-
-    #             elif choix == '2':
-    #                 prenom = is_empty("Entrer le nouveau prenom du professeur: (x pour quitter)")
-    #                 if prenom == 'x':
-    #                     return
-    #                 else:
-    #                     db.update_data(self.connection_db, "Professeurs", "id_prof", id_Professeur,  prenom_prof = prenom)
-    #                     print("Mise a jour effectuée")
-
-    #             elif choix == "3":
-    #                 while True:
-    #                     tel = is_empty("Entrer le nouveau telephone du prof: (x pour quitter)")
-    #                     if tel == 'x':
-    #                         return
-    #                     elif is_valid_phone_number(tel):
-    #                         db.update_data(self.connection_db, "Professeurs", "id_prof", id_Professeur,  tel_prof = tel)
-    #                         print("Mise a jour effectuée")
-    #                         break
-    #                     else:
-    #                         print("Telephone invalide. Exemple de formats valide:")
-    #                         print("(123) 456-7890")  # True
-    #                         print("123-456-7890")    # True
-    #                         print("123 456 7890")   # True
-    #                         print("1234567890")      # True
-    #             elif choix == '4':
-    #                 while True:
-    #                     email = is_empty("Entrer la npuvelle adresse mail du prof: ")
-    #                     if email == 'x':
-    #                         return
-    #                     elif is_valid_email(email):
-    #                         db.update_data(self.connection_db, "Professeurs", "id_prof", id_Professeur,  email = email)
-    #                         print("Mise a jour effectuée")
-    #                         break
-    #                     else:
-    #                         print("Email invalide.\nExemple: something@domain.com")
-    #             elif choix == '5':
-    #                 break #or return
-    #             elif choix == '6':
-    #                 self.connection_db.close()
-    #                 exit()
-    #             else:
-    #                 print("Vous devez choisir un chiffre entre 1 a 6.")
-    #     else:
-    #         print("Ce professeur n'est pas enregistré dans la base de données.")
 
     def rechercher(self):
         """filtrer la table Salles"""
@@ -404,18 +509,18 @@ class Gestion_Horaire:
     def menu_horaire (self) :
         """Fonction affichant les options de gestion des Professeurs"""
         while True:
-            clear_screen()
+            # clear_screen()
             banner()
             print(' '*20,'-'*32)        
             print(' '*21,'-'*8,"MENU HORAIRE",'-'*8)
             print(' '*20,'-'*32,'\n')        
             print(' '*20,"Bienvenue au menu de l'horaire.")
             print(' '*20,"Veuillez choisir votre option.")
-            print(' '*20,"1- Enregistrer un cours dans l'horaire.")
+            print(' '*20,"1- Enregistrer un cours dans l'horaire [admin].")
             print(' '*20,"2- Afficher tous les horaires.")
             print(' '*20,"3- Rechercher une horaire.")
-            print(' '*20,"4- Modifier une information dans l'horaire.(to do)")
-            print(' '*20,"5- Supprimer un cours de l'horaire.")
+            print(' '*20,"4- Modifier une information dans l'horaire[admin].")
+            print(' '*20,"5- Supprimer un cours de l'horaire[admin].")
             print(' '*20,"6- Retour au menu principal.")
             print(' '*20,"7- Quitter le programme.")
             try:
