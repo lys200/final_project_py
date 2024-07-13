@@ -9,7 +9,12 @@ ST-PREUX Christine
 
 
 import Databases_pack.database as db
+<<<<<<< HEAD
 from gestion_des_contraintes.contraintes import is_empty, banner,is_integer, afficher_donnees, afficher_entete,afficher_texte_progressivement, attendre_touche, clear_screen
+=======
+from gestion_des_contraintes.contraintes \
+import is_empty, banner,is_integer, afficher_donnees, afficher_entete,afficher_texte_progressivement, attendre_touche, clear_screen, func_exit
+>>>>>>> c7d6d2b3bf90703dac67fd4618b94016584da321
 
 """CREATE TABLE IF NOT EXISTS Salles (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -286,7 +291,7 @@ class Gestion_Salle:
                             db.delete_database(self.connection, "Horaire", "id", id_)   
                     print(' '*20,f"Suppression de la salle {id_salle} effectuée!")
                     break
-                elif choix == '2':
+                if choix == '2':
                     return
                 print(' '*20,"Vous devez choisir entre les options 1 et 2.")
         else:
@@ -310,48 +315,40 @@ class Gestion_Salle:
             print(' '*20,"5- Supprimer une salle[admin].")
             print(' '*20,"6- Retour au menu principal.")
             print(' '*20,"7- Quitter le programme.")
-            try:
-                choix = int(is_empty("Veuillez choisir votre option.[1-7]:"))
-            except TypeError as e:
-                print("Erreur veuiller entrer un entier valide: ", e)
+            
+            choix = is_empty("Veuillez choisir votre option.[1-7]:")
+            if self.adm_id:
+                if choix == '1':
+                    self.enregistrer()
+                elif choix == '2':
+                    self.lister()
+                elif choix == '3':
+                    self.rechercher()
+                elif choix == '4':
+                    self.modifier()
+                elif choix == '5':
+                    self.supprimer()
+                elif choix == '6':
+                    break  
+                elif choix == '7':
+                    func_exit()
+                else:
+                    print(' '*20,"Veuillez choisir un chiffre entre 1 et 7")
             else:
-                if choix < 1 or choix > 7:
+                if choix == '1':
+                    print(' '*20,"Accès interdit. Seuls les admins peuvent faire des enregistrements.\n")
+                elif choix == '2':
+                    self.lister()
+                elif choix == '3':
+                    self.rechercher()
+                elif choix == '4':
+                    print(' '*20,"Accès interdit. Seuls les admins peuvent faire des modifications.\n")
+                elif choix == '5':
+                    print(' '*20,"Accès interdit. Seuls les admins peuvent faire des suppressions.\n")
+                elif choix == '6':
+                    break  
+                elif choix == '7':
                     print(' '*20,"Veuillez choisir un chiffre entre 1 et 7")
                 else:
-                    if self.adm_id :
-                        if choix == 1:
-                            self.enregistrer()
-                        elif choix == 2:
-                            self.lister()
-                        elif choix == 3:
-                            self.rechercher()
-                        elif choix == 4:
-                            self.modifier()
-                        elif choix == 5:
-                            self.supprimer()
-                        elif choix == 6:
-                            break  
-                        else:
-                            print("\n",' '*20,"Fermeture du programme...\n")
-                            attendre_touche()
-                            exit() 
-                    else:
-                        if choix == 1:
-                            print(' '*20,"Accès interdit. Seuls les admins peuvent faire des enregistrements.\n")
-                            attendre_touche()
-                        elif choix == 2:
-                            self.lister()
-                        elif choix == 3:
-                            self.rechercher()
-                        elif choix == 4:
-                            print(' '*20,"Accès interdit. Seuls les admins peuvent faire des modifications.\n")
-                            attendre_touche()
-                        elif choix == 5:
-                            print(' '*20,"Accès interdit. Seuls les admins peuvent faire des suppressions.\n")
-                            attendre_touche()
-                        elif choix == 6:
-                            break  
-                        else:
-                            print("\n",' '*20,"Fermeture du programme...\n")
-                            attendre_touche()
-                            exit() 
+                    func_exit()
+                attendre_touche()

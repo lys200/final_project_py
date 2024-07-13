@@ -7,7 +7,7 @@ import hashlib
 import os
 from sys import platform
 from time import sleep
-
+from sys import exit
 
 def banner():
     phrase = "Projet Gestion des salles du Campus Henry Chistophe de Limonade"
@@ -16,6 +16,12 @@ def banner():
     print(" " * 10, "| " + phrase + " |")
     print(" " * 10, "+" + "-" * (longueur_phrase + 2) + "+")
     print("\n\n")
+
+
+def func_exit():
+    print('\n', ' '*20, "Fermeture du programme...")
+    attendre_touche()
+    exit()
 
 
 def is_empty(input_message):
