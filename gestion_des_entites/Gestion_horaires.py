@@ -247,7 +247,7 @@ class Gestion_Horaire:
                                 print(' '*20,f"Impossible de modifier l'horaire {id_horaire} pour {jour}", 
                                         ' '*20, "car un autre cours de déroule dans cette salle ce jour et a la meme heure.")
                             else:
-                                db.update_data(self.connection_db, "Horaire", "id", id_horaire, code_salle = salle) 
+                                db.update_data(self.connection_db, "Horaire", "id", id_horaire, jour = jour) 
                                 print(' '*20,"Mise a jour effectuée")
                                 break
                         else:
