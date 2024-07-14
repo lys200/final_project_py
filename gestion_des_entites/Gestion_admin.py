@@ -42,15 +42,16 @@ class Gestion_admin(Person):
                 print('\n',' '*20,"Mot de passe incorrect")
                 return False
             else:
-                print('\n',' '*20,"Id invalide.")
-                print('\n',' '*20,"1- Reessayer    2- Abandonner.")
-                ch = is_empty("Faites un choix")
-                if ch == '1':
-                    pass
-                elif ch == '2':
-                    return
-                else:
-                    print('\n',' '*20,"Choix invalide.\n")
+                while True:
+                    print('\n',' '*20,"Id invalide.")
+                    print('\n',' '*20,"1- Reessayer    2- Abandonner.")
+                    ch = is_empty("Faites un choix")
+                    if ch == '1':
+                        break
+                    elif ch == '2':
+                        return
+                    else:
+                        print('\n',' '*20,"Choix invalide.\n")
 
 
     def new_adm_account(self):
