@@ -17,7 +17,7 @@ import gestion_des_entites.Gestion_cours as crs
 import gestion_des_entites.Gestion_horaires as hor
 from gestion_des_contraintes.contraintes \
     import (is_empty, attendre_touche, clear_screen, banner,
-            afficher_texte_progressivement, func_exit)
+            welcome, func_exit)
 
 
 def menu_pricipal(adm_id):
@@ -68,12 +68,10 @@ def menu_pricipal(adm_id):
 
 def main():
     """Fonction principale contenant le fonctionnalites basiques du systeme."""
-    texte_bienvenue = """Bienvenue dans notre projet de
-        gestion des salle du CHCL.\n
-        il est recommandé de lancer le programme
-        dans une console pour une meilleure experience. """
+    
+    byenvini = True
     clear_screen()
-    afficher_texte_progressivement(texte_bienvenue, 0.01)
+    welcome(byenvini)
     attendre_touche()
     while True:
         clear_screen()

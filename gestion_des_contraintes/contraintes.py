@@ -289,3 +289,23 @@ def afficher_texte_progressivement(texte, delai=0.06):
         sleep(delai)
     print()
     # Pour passer à la ligne suivante après l'affichage complet du texte
+def welcome( bienvenue):
+    """
+    Affiche le texte progressivement caractère par caractère.
+
+    :param texte: Le texte à afficher.
+    :param delai: Le délai en secondes entre chaque caractère
+    (par défaut 0.1 seconde).
+    """
+    texte_bienvenue = """Bienvenue dans notre projet de
+        gestion des salle du CHCL.\n
+        il est recommandé de lancer le programme
+        dans une console pour une meilleure experience. """
+    
+    if bienvenue:
+        for caractere in texte_bienvenue:
+            print(caractere, end='', flush=True)
+            sleep(0.01)
+        print()
+    bienvenue = False
+    # Pour passer à la ligne suivante après l'affichage complet du texte

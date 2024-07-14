@@ -455,9 +455,9 @@ def afficher_horaire(conn):
             if heure_str in horaires[key] and jour in horaires[key][heure_str]:
                 if heure_fin_int - heure_debut_int > 2:
                     if heure == heure_debut_int:
-                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                        horaires[key][heure_str][jour] = f"{'-'*15}"
                     elif heure == heure_fin_int:
-                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                        horaires[key][heure_str][jour] = f"{'-'*15}"
                     elif heure == heure_debut_int + 1:
                         horaires[key][heure_str][jour] = f"{cours}"
                     elif heure == heure_debut_int + 2:
@@ -467,15 +467,15 @@ def afficher_horaire(conn):
 
                 elif heure_fin_int - heure_debut_int == 2:
                     if heure == heure_debut_int:
-                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                        horaires[key][heure_str][jour] = f"{'-'*15}"
                     elif heure == heure_fin_int:
-                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                        horaires[key][heure_str][jour] = f"{'-'*15}"
                     elif heure == heure_debut_int + 1:
                         horaires[key][heure_str][jour] = f"{cours} ({salle})"
 
                 elif heure_fin_int - heure_debut_int < 2:
                     if heure == heure_debut_int:
-                        horaires[key][heure_str][jour] = f"{"-"*15}"
+                        horaires[key][heure_str][jour] = f"{'-'*15}"
                     elif heure == heure_fin_int:
                         horaires[key][heure_str][jour] = f"{cours} ({salle})"
 
