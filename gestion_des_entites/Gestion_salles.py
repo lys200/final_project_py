@@ -15,15 +15,6 @@ from gestion_des_contraintes.contraintes import (is_empty, banner,is_integer,
                                                  afficher_texte_progressivement, 
                                                  attendre_touche, clear_screen, func_exit)
 
-"""CREATE TABLE IF NOT EXISTS Salles (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-id_salle TEXT, 
-num_salle INTEGER NOT NULL,
-id_batiment TEXT,
-etage INTEGER NOT NULL,
-nombre_de_siege INTEGER NOT NULL, 
-statut TEXT NOT NULL)
-"""
 
 class Gestion_Salle:
     """Class contenant toutes les fonctions relative a la gestion des Salles."""
@@ -285,6 +276,7 @@ class Gestion_Salle:
                 break
 
             elif choix == '7':
+                self.connection.close()
                 func_exit()
             else:
                 print(' '*20,"Entrée invalide, Veuillez choisir entre les options proposées.")
@@ -362,6 +354,7 @@ class Gestion_Salle:
                 elif choix == '6':
                     break
                 elif choix == '7':
+                    self.connection.close()
                     func_exit()
                 else:
                     print(' '*20,"Veuillez choisir un chiffre entre 1 et 7")
@@ -382,7 +375,8 @@ class Gestion_Salle:
                 elif choix == '6':
                     break
                 elif choix == '7':
-                    print(' '*20,"Veuillez choisir un chiffre entre 1 et 7")
-                else:
                     func_exit()
-                attendre_touche()
+                    self.connection.close()
+                    attendre_touche()
+                else:
+                    print(' '*20,"Veuillez choisir un chiffre entre 1 et 7")

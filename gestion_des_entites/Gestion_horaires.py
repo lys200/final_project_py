@@ -1,13 +1,10 @@
-"""CREATE TABLE IF NOT EXISTS Horaire (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-code_cours TEXT NOT NULL,
-code_salle TEXT NOT NULL,
-jour TEXT NOT NULL,
-heure_debut INTEGER NOT NULL,
-heure_fin INTEGER NOT NULL,
-session INTEGER NOT NULL,
-annee INTEGER NOT NULL
-)
+"""Projet final de Python 
+Date de remise: 12 Juillet 2024
+Nom des membres du Groupe:
+BELCEUS Samienove R.
+CHERELUS Solem
+MORISSET Nherlyse
+ST-PREUX Christine
 """
 
 """Ce module contient les codes de gestions des horaires."""
@@ -385,6 +382,7 @@ class Gestion_Horaire:
                 elif choix == '6':
                     break
                 elif choix == '7':
+                    self.connection_db.close()
                     func_exit()
                 else:
                     print(" "*20, "Veuillez choisir un chiffre entre 1 et 7.\n")
@@ -503,9 +501,13 @@ class Gestion_Horaire:
                 session = is_empty("Entrer la session [1-2]: ")
                 if session == '1' or session == '2':
                     datas = db.search_by_data(self.connection_db, "Horaire","session", session)
-                    placeholders = ['id Horaire','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
-                    largeur, separateur = afficher_entete(placeholders)
-                    afficher_donnees(datas, largeur, separateur)
+                    if datas:
+                        placeholders = ['id Horaire','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
+                        largeur, separateur = afficher_entete(placeholders)
+                        afficher_donnees(datas, largeur, separateur)
+                    else:
+                        print(' '*20,f"Aucun Horaire n'est encore enregistré pour la session {session}.")
+
                 else:
                     print(' '*20,"La session doit etre 1 ou 2.")
 
@@ -529,6 +531,7 @@ class Gestion_Horaire:
                 break
 
             elif choix == '10':
+                self.connection_db.close()
                 func_exit()
 
             else:
@@ -616,6 +619,7 @@ class Gestion_Horaire:
                         elif choix == 6:
                             break  
                         else:
+                            self.connection_db.close()
                             func_exit()
                     else:
                         if choix == 1:
@@ -651,4 +655,5 @@ class Gestion_Horaire:
                         elif choix == 6:
                             break  
                         else:
+                            self.connection_db.close()
                             func_exit()

@@ -9,12 +9,7 @@ ST-PREUX Christine
 
 import Databases_pack.database as db
 from gestion_des_contraintes.contraintes import func_exit, banner, afficher_entete, afficher_donnees, is_empty, is_valid_email, is_valid_phone_number, clear_screen, attendre_touche, Person, afficher_texte_progressivement
-'''id INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_prof TEXT PRYMARY KEY, 
-                nom_prof TEXT NOT NULL,
-                prenom_prof TEXT NOT NULL,
-                tel_prof TEXT NOT NULL,
-                email TEXT NOT NULL'''
+
 
 class Gestion_Professeur:
     """Class contenant toutes les fonctions relative a la gestion des Salles."""
@@ -124,6 +119,7 @@ class Gestion_Professeur:
                 elif choix == '5':
                     break #or return
                 elif choix == '6':
+                    self.connection.close()
                     func_exit()
                 else:
                     print(' '*20,"Vous devez choisir un chiffre entre 1 a 6.")
@@ -156,6 +152,7 @@ class Gestion_Professeur:
                 break
 
             elif choix == '3':
+                self.connection.close()
                 func_exit()
 
             else:
@@ -247,6 +244,7 @@ class Gestion_Professeur:
                         elif choix == 6:
                             break  
                         else:
+                            self.connection.close()
                             func_exit()
                     else:
                         if choix == 1:
@@ -267,5 +265,6 @@ class Gestion_Professeur:
                         elif choix == 6:
                             break  
                         else:
+                            self.connection.close()
                             func_exit()
                     

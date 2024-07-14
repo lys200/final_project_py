@@ -11,15 +11,8 @@ ST-PREUX Christine
 
 import Databases_pack.database as db
 from gestion_des_contraintes.contraintes import func_exit,afficher_texte_progressivement, is_integer, attendre_touche, clear_screen,banner, is_empty, afficher_entete, afficher_donnees
-"""   base = 'test3.db'
-    conn = db.connect_to_database(base)
-    db.initialize_db(conn)
-    #db.insert_data(conn,"Batiments", id_batiment="b", nombre_etages=4, salle_de_cours=18)
-        #db.update_data(conn,"Batiments" ,'A', nombre_etages = 0, salle_de_cours=20)
-    db.delete_Database(conn, 'Batiments', 'id_batiment', "b")
-    bat = db.read_database(conn, "Batiments")
-print(bat)
-"""
+
+
 class Gestion_Batiment:
     """Class contenant les fonctions relative aux batiments."""
 
@@ -28,9 +21,9 @@ class Gestion_Batiment:
     #choix = 0
     def __init__(self, adm_id):
         """Methode de constructeur gerant les attributs du batiments."""
-        self.curseur = db.connect_to_database("Gestion_des_salles.db")
+        self.connection_db = db.connect_to_database("Gestion_des_salles.db")
         self.adm_id = adm_id
-        db.initialize_conn(self.curseur)
+        db.initialize_conn(self.connection_db)
   
     def enregistrer(self):
         """Enregistre un nouveau batiment."""
@@ -44,19 +37,19 @@ class Gestion_Batiment:
             else:
                 print(' '*20, "Le batiment doit etre A, B, C ou D.\n")
         # verifier que le id_batiment n'exsite pas deja dans la table Batiment
-        is_batiment = db.search_by_data(self.curseur, "batiments", "id_batiment", id_bat)
+        is_batiment = db.search_by_data(self.connection_db, "batiments", "id_batiment", id_bat)
         # insertion des donnees dans la table batiments
         if is_batiment:
             print(' '*20, "Ce batiment est déja enregistré.")
         else:
-            db.insert_data(self.curseur, "Batiments", id_batiment = id_bat, nombre_etages = 3, salle_de_cours = 0)
+            db.insert_data(self.connection_db, "Batiments", id_batiment = id_bat, nombre_etages = 3, salle_de_cours = 0)
             print(' '*20, "Par défaut, le nombre d'étages est fixé à 3 et le nombre de salle à 0.")
             print(' '*20, "Veuillez passer au menu salle pour enregistrer des salles dans le batiment de votre choix")
             print(' '*20, f"Le Batiment {id_bat} est enregistré aves succès.\n")
        
     def lister(self):
         """Lister toutes les lignes de la table Batiments."""
-        datas = db.read_database(self.curseur, "Batiments")
+        datas = db.read_database(self.connection_db, "Batiments")
         if datas:
             print(' '*20, "Voici les infos enregistrées sur les batiments:\n ")
             columns= ['index', 'batiments', 'étages', 'salles']
@@ -86,8 +79,8 @@ class Gestion_Batiment:
                 id_batiment = is_empty("(x pour quitter)").upper()
                 if id_batiment == "X":
                     return
-                elif db.verify_data(self.curseur, "Batiments", "id_batiment", id_batiment) == True:
-                    datas = db.search_by_data(self.curseur, "Batiments", "id_batiment", id_batiment)
+                elif db.verify_data(self.connection_db, "Batiments", "id_batiment", id_batiment) == True:
+                    datas = db.search_by_data(self.connection_db, "Batiments", "id_batiment", id_batiment)
                     columns= ['index', 'batiments', 'étages', 'salles']
                     largeur, separateur = afficher_entete(columns)
                     afficher_donnees(datas, largeur, separateur)
@@ -98,8 +91,8 @@ class Gestion_Batiment:
                 id_batiment = is_empty("(x pour quitter)").upper()
                 if id_batiment == "X":
                     return
-                elif db.verify_data(self.curseur, "Salles", "id_batiment", id_batiment):
-                    datas = db.search_by_data(self.curseur, "Salles", "id_batiment", id_batiment)
+                elif db.verify_data(self.connection_db, "Salles", "id_batiment", id_batiment):
+                    datas = db.search_by_data(self.connection_db, "Salles", "id_batiment", id_batiment)
                     if datas:
                         print(' '*20, f"Voici les infos des salles se trouvant au batiment {id_batiment}. \n")
                         columns= ['index', 'Salles', 'numero', 'batiment', 'etage', 'nombre de siege']
@@ -113,7 +106,7 @@ class Gestion_Batiment:
                 if nbre_salle == "x":
                     return
                 if is_integer(nbre_salle):
-                    datas = db.search_by_data(self.curseur, "Batiments", "salle_de_cours", nbre_salle)
+                    datas = db.search_by_data(self.connection_db, "Batiments", "salle_de_cours", nbre_salle)
                     if datas:
                         print(' '*20, f"Voici les informations des batiments contenant {nbre_salle} salle(s).\n")
                         columns = ['index', 'batiments', 'étages', 'salles']
@@ -126,6 +119,7 @@ class Gestion_Batiment:
             elif choix == '4':
                 break
             elif choix == '5':
+                self.connection_db.close()
                 func_exit()
             else:
                 print(' '*20, "Vous devez choisir entre 1 a 5.")
@@ -137,7 +131,7 @@ class Gestion_Batiment:
         id_batiment = is_empty("(x pour quitter)").upper()
         if id_batiment == 'X':
             return
-        if db.verify_data(self.curseur, "Batiments", "id_batiment", id_batiment) == True:
+        if db.verify_data(self.connection_db, "Batiments", "id_batiment", id_batiment) == True:
             while True:
                 print("\n\t\t\t\tATTENTION!")
                 Warning_= f"La supression du batiment {id_batiment} va entrainer la supression de toutes les salles de ce batiment."
@@ -149,7 +143,7 @@ class Gestion_Batiment:
                 if choix == '1':
                     # suppression des salles de ce batiment
                     # recuperantion des id des ces salles
-                    salles = db.search_by_data(self.curseur, "Salles", "id_batiment", id_batiment)
+                    salles = db.search_by_data(self.connection_db, "Salles", "id_batiment", id_batiment)
                     if salles:
                         salles_to_delete = []
                         for salle in salles:
@@ -159,16 +153,16 @@ class Gestion_Batiment:
                         horaire_id = []
                         for id_ in salles_to_delete:
                             print(' '*20, f'suppresion de la salle {id_} du batiment {id_batiment}')
-                            db.delete_database(self.curseur, "Salles", "id_salle", id_)
+                            db.delete_database(self.connection_db, "Salles", "id_salle", id_)
                             # recuperer la liste des horaires de chaque salle
-                            horaire_id.append((db.search_by_data(self.curseur, "Horaire", "code_salle", id_))[0][0])
+                            horaire_id.append((db.search_by_data(self.connection_db, "Horaire", "code_salle", id_))[0][0])
                         if horaire_id:
                     # supprimer chaque id de chaque sous liste
                             for id_list in horaire_id:  
                                 print(' '*20, f"Supression d'horaire {id_} de la table horaires.")
-                                db.delete_database(self.curseur, "Horaire", "id", id_)
+                                db.delete_database(self.connection_db, "Horaire", "id", id_)
                     # suppression du batiment
-                    db.delete_database(self.curseur, "Batiments", "id_batiment", id_batiment)
+                    db.delete_database(self.connection_db, "Batiments", "id_batiment", id_batiment)
                     print(' '*20, f"Suppression du batiment {id_batiment} et ses salles effectuée!")
                     break
                 elif choix == '2':
@@ -218,6 +212,7 @@ class Gestion_Batiment:
                         elif choix == 5:
                             break
                         else:
+                            self.connection_db.close()
                             func_exit()
                     else:
                         if choix == 1:
@@ -235,4 +230,5 @@ class Gestion_Batiment:
                         elif choix == 5:
                             break
                         else:
+                            self.connection_db.close()
                             func_exit()

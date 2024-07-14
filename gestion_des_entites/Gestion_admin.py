@@ -1,3 +1,12 @@
+"""Projet final de Python 
+Date de remise: 12 Juillet 2024
+Nom des membres du Groupe:
+BELCEUS Samienove R.
+CHERELUS Solem
+MORISSET Nherlyse
+ST-PREUX Christine
+"""
+
 """Ici on trouve les codes concernant l'authentification de l'administrateur."""
 import Databases_pack.database as db
 from gestion_des_contraintes.contraintes \

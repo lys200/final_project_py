@@ -1,3 +1,16 @@
+Projet final de Python 
+Date de remise: 12 Juillet 2024
+
+Nom des membres du Groupe:
+BELCEUS Samienove R.
+CHERELUS Solem
+MORISSET Nherlyse
+ST-PREUX Christine
+
+
+Description:
+
+
 Ce programme  permet de gérer les bâtiments, les salles , les cours, les professeurs , 
 les horaires au sein du Campus Henri Christophe de Limonade.
 

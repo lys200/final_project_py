@@ -1,5 +1,4 @@
 """Projet final de Python.
-
 Date de remise: 12 Juillet 2024
 Nom des membres du Groupe:
 BELCEUS Samienove R.

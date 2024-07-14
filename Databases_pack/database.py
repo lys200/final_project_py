@@ -1,4 +1,11 @@
-"""
+"""Projet final de Python 
+Date de remise: 12 Juillet 2024
+Nom des membres du Groupe:
+BELCEUS Samienove R.
+CHERELUS Solem
+MORISSET Nherlyse
+ST-PREUX Christine
+
     Ce ficher contient les fonctions de gestion de la base de donnees
     pour la gestion des salles de cours au chcl.
 """
@@ -192,6 +199,7 @@ def insert_data(conn, table_name, **kwargs):
         print(f"Erreur d'integrite dans la table {table_name}:", e)
     else:
         print('\n', ' '*20, "Insertion réussie!!!")
+        curseur.close()
 
 
 def read_database(conn, table_name):
@@ -233,6 +241,7 @@ def update_data(conn, table_name,  id_entite, id_value, **kwargs):
     # Exécuter la requête avec les valeurs fournies
     curseur.execute(query, values)
     conn.commit()
+    curseur.close()
 
 
 def delete_database(conn, table_name, id_name, id_value):
@@ -245,6 +254,7 @@ def delete_database(conn, table_name, id_name, id_value):
     query = f"DELETE FROM {table_name} WHERE {id_name} = ?"
     curseur.execute(query,  (id_value,))
     conn.commit()
+    curseur.close()
 
 
 def verify_data(conn, table_name, column_name, valeur):
@@ -281,6 +291,7 @@ def verify_column(conn, table_name, column_name):
         cursor.execute(query)
         columns_info = cursor.fetchall()
         # Vérification de l'existence de la colonne
+        cursor.close()
         for column in columns_info:
             if column[1] == column_name:
                 return True

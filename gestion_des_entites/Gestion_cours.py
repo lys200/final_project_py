@@ -11,25 +11,19 @@ import Databases_pack.database as db
 from gestion_des_contraintes.contraintes import is_empty,attendre_touche,\
     verifier_format_heure_v2, banner, clear_screen, afficher_texte_progressivement , afficher_entete, afficher_donnees,\
     func_exit
-"""CREATE TABLE IF NOT EXISTS Cours (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                id_cours TEXT,
-                nom_cours TEXT NOT NULL,
-                id_prof TEXT NOT NULL,
-                nom_fac TEXT,
-                duree TEXT NOT NULL)
-        """ 
+
 class Gestion_Cours:
     """Classe contenant toutes les fonctions relative a la gestion des Salles."""
     
     def __init__(self, adm_id):
         """Methode constructeur pour la classe cours."""
-        self.curseur = db.connect_to_database("Gestion_des_salles.db")
+        self.connection_db = db.connect_to_database("Gestion_des_salles.db")
         self.adm_id = adm_id
-        db.initialize_conn(self.curseur)
+        db.initialize_conn(self.connection_db)
         
     def enregistrer(self):
         """Enregistre un nouveau cours."""
+        print()
         nom = is_empty("Entrer le nom du cours:(x pour quitter).").capitalize()
         if nom.lower() == 'x':
             return
@@ -48,6 +42,7 @@ class Gestion_Cours:
             }
         while True:
             try:
+                print()
                 niveau = is_empty("Entrer le niveau dans lequel sera enseigné le cours(x pour quitter)")
                 if niveau == 'x':
                     return
@@ -61,7 +56,7 @@ class Gestion_Cours:
                 else:
                     break
         id_crs = f"{nom[0:3]}_{fac[0:3]}_L{str(niveau)}"
-        if db.verify_data(self.curseur, "Cours", "id_cours", id_crs):
+        if db.verify_data(self.connection_db, "Cours", "id_cours", id_crs):
             print(' '*20,f"Le cours de {nom} est deja enregistré pour le niveau L{niveau} en {fac}.")
         else:
             while True:
@@ -75,10 +70,10 @@ class Gestion_Cours:
                     return
                 #verifier que le id_prof exsite  deja dans la table Professeurs
                 else:
-                    is_prof = db.search_by_data(self.curseur, "Professeurs", "id_prof", prof)
+                    is_prof = db.search_by_data(self.connection_db, "Professeurs", "id_prof", prof)
                     #insertion des donnees dans la table batiments
                     if not is_prof:
-                        print(' '*20,f"Le professeur {is_prof} n'est pas enregistré dans la table des professeurs.")
+                        print('\n',' '*20,f"Le professeur {is_prof} n'est pas enregistré dans la table des professeurs.")
                         print(' '*20,"Veuillez d'abord l'enregistrer dans le menu 'Professeurs'.\n")
                         ch = is_empty("1- Reessayer 2-Abandonner l'enregistrement")
                         if ch == "1":
@@ -91,7 +86,7 @@ class Gestion_Cours:
                         break
 
             while True:
-                print(' '*20,"Entrer la durée du cours(HH:MM format 24h): ")
+                print('\n',' '*20,"Entrer la durée du cours(HH:MM format 24h): ")
                 duree = is_empty("(x pour quitter)")
                 if duree.lower() ==  'x':
                     return
@@ -99,7 +94,7 @@ class Gestion_Cours:
                     heure_h, minute_m = map(int, duree.split(':'))
                     total_minutes = heure_h * 60 + minute_m
                     if (total_minutes >= 60) and (total_minutes <= 360):
-                        db.insert_data(self.curseur, 'Cours', nom_cours = nom, nom_fac = fac, niveau = niveau, id_prof = prof, duree = duree)
+                        db.insert_data(self.connection_db, 'Cours', nom_cours = nom, nom_fac = fac, niveau = niveau, id_prof = prof, duree = duree)
                         break
                     else:
                         while True:
@@ -113,9 +108,8 @@ class Gestion_Cours:
                                 print(' '*20,'Choisissez entre 1 et 2')
                 else:
                     while True:
-                        print(' '*20,"Format d'heure invalide.")
-                        print(' '*20,"1- reassayer         2- abandonner l'enregistrement")
-                        ch = input(" --> ")
+                        print('\n',' '*20,"Format d'heure invalide.")
+                        ch = input("1- reassayer         2- abandonner l'enregistrement")
                         if ch == '1':
                             break
                         elif ch == '2':
@@ -125,7 +119,7 @@ class Gestion_Cours:
                     
     def lister(self):
         """Lister tous les Cours de la table Cours."""
-        datas = db.read_database(self.curseur, "Cours")
+        datas = db.read_database(self.connection_db, "Cours")
         if not datas:
             print("\n", ' '*20,"Aucun cours n'est encore enregistré.\n")
         else:
@@ -133,13 +127,14 @@ class Gestion_Cours:
             columns = ['Index','Id du cours','nom cours' ,"   Faculté   " ,'Niveau' ,'Id_prof', 'Durée']
             largeur, separateur = afficher_entete(columns)
             afficher_donnees(datas, largeur, separateur)
+        attendre_touche()
             
     def modifier(self):        
         """Modify les infos d'un cours."""
         id_cours = is_empty("Entrer le id du cours a modifier (x pour quitter):")
         if id_cours == 'x':
             return
-        elif db.verify_data(self.curseur, "Cours", "id_cours", id_cours) :
+        elif db.verify_data(self.connection_db, "Cours", "id_cours", id_cours) :
             while True:
                 clear_screen()
                 banner()
@@ -160,9 +155,9 @@ class Gestion_Cours:
                         prof = is_empty("Entrer le nouveau id du professeur\n(x pour quitter): ")
                         if prof == 'x':
                             break  
-                        elif db.verify_data(self.curseur, "Professeurs", "id_prof", prof):
+                        elif db.verify_data(self.connection_db, "Professeurs", "id_prof", prof):
                             #insertion du nouveau prof dans la table cours
-                            db.update_data(self.curseur, "Cours", "id_cours", id_cours, id_prof = prof)
+                            db.update_data(self.connection_db, "Cours", "id_cours", id_cours, id_prof = prof)
                             break
                         else:
                                 print("\n",' '*20,f"Le professeur {prof} n'est pas enregistré dans la table des professeurs.")
@@ -186,7 +181,7 @@ class Gestion_Cours:
                             heure_h, minute_m = map(int, duree.split(':'))
                             total_minutes = heure_h * 60 + minute_m
                             if total_minutes > 60 and total_minutes < 360:
-                                db.update_data(self.curseur, "Cours", 'id_cours', id_cours, duree = duree)
+                                db.update_data(self.connection_db, "Cours", 'id_cours', id_cours, duree = duree)
                                 break
                             else:
                                 print(' '*20,"La durée ne doit pas etre inferieure a 1h ou superieure a 6h.")
@@ -212,6 +207,7 @@ class Gestion_Cours:
                 elif choix == "3":
                     break #or return
                 elif choix == '4':
+                    self.connection_db.close()
                     func_exit()
                 else:
                     print(' '*20,"Vous devez choisir un chiffre compris entre 1 et 4.")
@@ -243,8 +239,8 @@ class Gestion_Cours:
                     cours = is_empty("Entrer l'id du cours a afficher (x pour quitter):  ")
                     if cours == 'x':
                         break
-                    elif db.verify_data(self.curseur, "Cours", "id_cours", cours):
-                        datas = db.search_by_data(self.curseur, "Cours","id_cours", cours)
+                    elif db.verify_data(self.connection_db, "Cours", "id_cours", cours):
+                        datas = db.search_by_data(self.connection_db, "Cours","id_cours", cours)
                         columns = ['Index','Id du cours','nom cours' ,"   Faculté   " ,'Niveau' ,'Id_prof', 'Durée']
                         largeur, separateur = afficher_entete(columns)
                         afficher_donnees(datas, largeur, separateur)
@@ -257,8 +253,8 @@ class Gestion_Cours:
                     nom = is_empty("Entrer le nom a afficher (x pour quitter): ")
                     if nom == 'x':
                         break
-                    elif db.verify_data(self.curseur, "Cours", "nom_cours", nom):
-                        datas = db.search_by_data(self.curseur, "Cours","nom_cours", nom)
+                    elif db.verify_data(self.connection_db, "Cours", "nom_cours", nom):
+                        datas = db.search_by_data(self.connection_db, "Cours","nom_cours", nom)
                         columns = ['Index','Id du cours','nom cours' ,"   Faculté   " ,'Niveau' ,'Id_prof', 'Durée']
                         largeur, separateur = afficher_entete(columns)
                         afficher_donnees(datas, largeur, separateur)
@@ -271,8 +267,8 @@ class Gestion_Cours:
                     fac = is_empty("Entrer la faculté dont vous vouller afficher les cours (x pour quitter): ")
                     if fac == 'x':
                         break
-                    elif db.verify_data(self.curseur, "Cours", "nom_fac", fac):
-                        datas = db.search_by_data(self.curseur, "Cours","nom_fac", fac)
+                    elif db.verify_data(self.connection_db, "Cours", "nom_fac", fac):
+                        datas = db.search_by_data(self.connection_db, "Cours","nom_fac", fac)
                         columns = ['Index','Id du cours','nom cours' ,"   Faculté   " ,'Niveau' ,'Id_prof', 'Durée']
                         largeur, separateur = afficher_entete(columns)
                         afficher_donnees(datas, largeur, separateur)
@@ -285,8 +281,8 @@ class Gestion_Cours:
                     level = is_empty("Entrer le niveau dont vous vouller afficher les cours (x pour quitter): ")
                     if level == 'x':
                         break
-                    elif db.verify_data(self.curseur, "Cours", "niveau", level):
-                        datas = db.search_by_data(self.curseur, "Cours","niveau", level)
+                    elif db.verify_data(self.connection_db, "Cours", "niveau", level):
+                        datas = db.search_by_data(self.connection_db, "Cours","niveau", level)
                         columns = ['Index','Id du cours','nom cours' ,"   Faculté   " ,'Niveau' ,'Id_prof', 'Durée']
                         largeur, separateur = afficher_entete(columns)
                         afficher_donnees(datas, largeur, separateur)
@@ -299,9 +295,9 @@ class Gestion_Cours:
                     prof = is_empty("Entrer l'id du professeur dont vous vouller afficher les cours (x pour quitter): ")
                     if prof.lower() == 'x':
                         break
-                    elif db.verify_data(self.curseur, "Cours", "id_prof", prof):
+                    elif db.verify_data(self.connection_db, "Cours", "id_prof", prof):
                         print (' '*20,f"\t\tLes cours du niveau {prof} sont les suivants: ")
-                        datas = db.search_by_data(self.curseur, "Cours","id_prof", prof)
+                        datas = db.search_by_data(self.connection_db, "Cours","id_prof", prof)
                         columns = ['Index','Id du cours','nom cours' ,"   Faculté   " ,'Niveau' ,'Id_prof', 'Durée']
                         largeur, separateur = afficher_entete(columns)
                         afficher_donnees(datas, largeur, separateur)
@@ -317,9 +313,9 @@ class Gestion_Cours:
                         break
                     else:
                         if verifier_format_heure_v2(duree):
-                            if db.verify_data(self.curseur, "Cours", "duree", duree):
+                            if db.verify_data(self.connection_db, "Cours", "duree", duree):
                                 print (' '*20,f"\t\tLes cours de durrée {duree} sont les suivants: ")
-                                datas = db.search_by_data(self.curseur, "Cours","duree", duree)
+                                datas = db.search_by_data(self.connection_db, "Cours","duree", duree)
                                 columns = ['Index','Id du cours','nom cours' ,"   Faculté   " ,'Niveau' ,'Id_prof', 'Durée']
                                 largeur, separateur = afficher_entete(columns)
                                 afficher_donnees(datas, largeur, separateur)
@@ -340,6 +336,7 @@ class Gestion_Cours:
                 break
             
             elif choix == '8':
+                self.connection_db.close()
                 func_exit()
 
             else:
@@ -351,7 +348,7 @@ class Gestion_Cours:
         id_cours = is_empty("Entrer l'id du cours a supprimer:(x pour quitter) ")
         if id_cours == 'x':
             return
-        elif db.verify_data(self.curseur, "Cours", "id_cours", id_cours):
+        elif db.verify_data(self.connection_db, "Cours", "id_cours", id_cours):
             while True: 
                 Warning_= f"\t\t\t\tATTENTION!\n"
                 Warning_1 = f"La supression du cours {id_cours} va entrainer la supression de toutes les horaires enregistrées pour ce cours.\n"
@@ -361,17 +358,17 @@ class Gestion_Cours:
                 choix = is_empty("1- Supprimer \t2- Annuler")
                 if choix == '1':
                     # recuperation des horaires de ce cours
-                    horaires = db.search_by_data(self.curseur, "Horaire", "code_cours", id_cours)                    
+                    horaires = db.search_by_data(self.connection_db, "Horaire", "code_cours", id_cours)                    
                     horaires_to_del = []
                     for horaire in horaires:
                         horaires_to_del.append(horaire[0])
                     # supression des horaires
                     for id_ in horaires_to_del:
                         print(' '*20, f"Suppression de l'horaire {id_} de la base de données")
-                        db.delete_database(self.curseur, "Horaire", "id", id_)
+                        db.delete_database(self.connection_db, "Horaire", "id", id_)
                     # suppression du cours 
 
-                    db.delete_database(self.curseur, "Cours", "id_cours", id_cours)
+                    db.delete_database(self.connection_db, "Cours", "id_cours", id_cours)
                     print(' '*20,f"Suppression du cours {id_cours} effectuée!")
                     break
                 elif choix == '2':
@@ -420,6 +417,7 @@ class Gestion_Cours:
                         elif choix == 6:
                             break  
                         else:
+                            self.connection_db.close()
                             func_exit() 
                     else:
                         if choix == 1:
@@ -435,4 +433,5 @@ class Gestion_Cours:
                         elif choix == 6:
                             break  
                         else:
+                            self.connection_db.close()
                             func_exit()  

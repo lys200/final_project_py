@@ -1,5 +1,12 @@
-"""
-    Ce module contient les differents test de contraintes
+"""Projet final de Python 
+Date de remise: 12 Juillet 2024
+Nom des membres du Groupe:
+BELCEUS Samienove R.
+CHERELUS Solem
+MORISSET Nherlyse
+ST-PREUX Christine
+
+Ce module contient les differents test de contraintes
 """
 from datetime import datetime
 import re
