@@ -9,7 +9,8 @@ ST-PREUX Christine
 
 import Databases_pack.database as db
 from gestion_des_contraintes.contraintes import is_empty,attendre_touche,\
-    verifier_format_heure_v2, banner, clear_screen, afficher_texte_progressivement , afficher_entete, afficher_donnees
+    verifier_format_heure_v2, banner, clear_screen, afficher_texte_progressivement , afficher_entete, afficher_donnees,\
+    func_exit
 """CREATE TABLE IF NOT EXISTS Cours (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 id_cours TEXT,
@@ -140,8 +141,13 @@ class Gestion_Cours:
             return
         elif db.verify_data(self.curseur, "Cours", "id_cours", id_cours) :
             while True:
+                clear_screen()
+                banner()
+                print(' '*10, "Gestion cours")
+                print(' '*10, "*************\n")
+
                 print(' '*20,'-'*8,"MENU MODIFIER Cours",'-'*8)
-                print(' '*20,'-'*32)
+                print()
                 print(' '*20,"Veuillez choisir entre les parmi options de modification suivantes: ")
                 print(' '*20,"1- Modifier l'id du professeur.")
                 print(' '*20,"2- Modifier la durée du cours.")
@@ -206,9 +212,7 @@ class Gestion_Cours:
                 elif choix == "3":
                     break #or return
                 elif choix == '4':
-                    print(' '*20,"Fermeture du programme...")
-                    attendre_touche()
-                    exit()
+                    func_exit()
                 else:
                     print(' '*20,"Vous devez choisir un chiffre compris entre 1 et 4.")
         else:
@@ -219,7 +223,10 @@ class Gestion_Cours:
         while True:
             clear_screen()
             banner()
+            print(' '*10, "Gestion cours")
+            print(' '*10, "*************\n")
             print(' '*20,'-'*8,"MENU RECHERCHER COURS",'-'*8)
+            print()
             print(' '*20,"Pour faire une recherche par filtre , vous devez choisir entre les parmi options suivantes: ")
             print(' '*20,"1- Rechercher un Cours par son id.")
             print(' '*20,"2- Afficher les cours par nom.")
@@ -333,9 +340,7 @@ class Gestion_Cours:
                 break
             
             elif choix == '8':
-                print(' '*20,"Fermeture du programme...")
-                attendre_touche()
-                exit()
+                func_exit()
 
             else:
                 print(' '*20,"Entrée invalide, Veuillez choisir entre les options proposées.")
@@ -379,6 +384,8 @@ class Gestion_Cours:
     def menu_cours (self) :
         """Fonction affichant les options de gestion des Cours."""
         while True:
+            clear_screen()
+            banner()
             print(' '*20,'-'*32)        
             print(' '*21,'-'*9,"MENU COURS",'-'*9)
             print(' '*20,'-'*32,'\n')        
@@ -413,9 +420,7 @@ class Gestion_Cours:
                         elif choix == 6:
                             break  
                         else:
-                            print("\n",' '*20,"Fermeture du programme...\n")
-                            attendre_touche()
-                            exit() 
+                            func_exit() 
                     else:
                         if choix == 1:
                             print(' '*20,"Accès interdit. Seuls les admins peuvent faire des enregistrements.\n")
@@ -430,6 +435,4 @@ class Gestion_Cours:
                         elif choix == 6:
                             break  
                         else:
-                            print("\n",' '*20,"Fermeture du programme...\n")
-                            attendre_touche()
-                            exit()  
+                            func_exit()  

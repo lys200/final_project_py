@@ -297,15 +297,46 @@ def welcome( bienvenue):
     :param delai: Le délai en secondes entre chaque caractère
     (par défaut 0.1 seconde).
     """
-    texte_bienvenue = """Bienvenue dans notre projet de
-        gestion des salle du CHCL.\n
-        il est recommandé de lancer le programme
-        dans une console pour une meilleure experience. """
+    print("\n\n")
+    print(' ' * 27, "  ____  _   _   ____   _ ")
+    print(' ' * 27, " / ___)| | | | / ___) | |")
+    print(' ' * 27, "| |    | |_| || |     | |")
+    print(' ' * 27, "| |___ |  _  || |___  | |___")
+    print(' ' * 27, " \\____)|_| |_| \\____) |_____)")
+    print("\n\n")
+   
+    text = (' ' * 24 +
+            "Bienvenue dans le système de gestion\n" +
+            ' ' * 20 +
+            "des salles de cours de l'université CHCL.")
+    texte_bienvenue = ("\n\n" +
+                       ' ' * 15 +
+        "->Il est recommandé de lancer le programme\n" +
+        ' ' * 15 + "->dans un terminal en full screen pour une meilleure\n" +
+         ' ' * 15 + "->experience(surtout pour l'affichage des tableaux).")
+    Warning_ = ("\n\n\t\t" +
+                       ' ' * 20 +
+        "ATTENTION!!!\n" +
+        ' ' * 12 + "-> Les Id ainsi que les mots de passes sont sensibles a la case..")
     
+    print(' ' * 17,'_' * 50, '\n')
+
     if bienvenue:
-        for caractere in texte_bienvenue:
+        for caractere in text:
+            print(caractere, end='', flush=True)
+            sleep(0.01)
+        
+        print()
+        attendre_touche()
+        for caractere in Warning_:
             print(caractere, end='', flush=True)
             sleep(0.01)
         print()
+        attendre_touche()
+        for caractere in texte_bienvenue:
+            print(caractere, end='', flush=True)
+            sleep(0.01)
+        print()    
+    
     bienvenue = False
     # Pour passer à la ligne suivante après l'affichage complet du texte

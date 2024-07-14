@@ -483,8 +483,8 @@ def afficher_horaire(conn):
     for key, horaire in horaires.items():
         annee, session, niveau, faculte = key
         print(' ' * 20,
-              f"Horaire session: {session} {annee} - Niveau {niveau}"
-              "Faculté de {faculte}:")
+              f"Horaire session {session}-{annee}, Niveau {niveau}"
+              f" Faculté de {faculte}:")
         print(' ' * 15 +
               '+' + '+'.join('-' * (col_width + 2) for _ in jours) +
               '+' + '-' * 17 + '+')
@@ -514,3 +514,4 @@ def afficher_horaire(conn):
               '+'.join('-' * (col_width + 2) for _ in jours),
               '+' + '-' * 17 + '+')
         print('\n' + ' ' * 33 + '-' * 91 + '\n')
+    cursor.close()

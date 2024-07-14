@@ -10,7 +10,7 @@ ST-PREUX Christine
 """"Ce fichier fait la gestion des batiments."""
 
 import Databases_pack.database as db
-from gestion_des_contraintes.contraintes import afficher_texte_progressivement, is_integer, attendre_touche, clear_screen,banner, is_empty, afficher_entete, afficher_donnees
+from gestion_des_contraintes.contraintes import func_exit,afficher_texte_progressivement, is_integer, attendre_touche, clear_screen,banner, is_empty, afficher_entete, afficher_donnees
 """   base = 'test3.db'
     conn = db.connect_to_database(base)
     db.initialize_db(conn)
@@ -126,9 +126,7 @@ class Gestion_Batiment:
             elif choix == '4':
                 break
             elif choix == '5':
-                print(' '*20, "Fermeture du programme...")
-                attendre_touche()
-                exit()
+                func_exit()
             else:
                 print(' '*20, "Vous devez choisir entre 1 a 5.")
             attendre_touche()
@@ -220,9 +218,7 @@ class Gestion_Batiment:
                         elif choix == 5:
                             break
                         else:
-                            print('\n', ' '*20, "Fermeture du programme...\n")
-                            attendre_touche()
-                            exit()
+                            func_exit()
                     else:
                         if choix == 1:
                             print(' '*20, "Accès interdit. Seuls les adm peuvent enregistrer.\n")
@@ -239,6 +235,4 @@ class Gestion_Batiment:
                         elif choix == 5:
                             break
                         else:
-                            print('\n', ' '*20, "Fermeture du programme...\n")
-                            attendre_touche()
-                            exit()
+                            func_exit()

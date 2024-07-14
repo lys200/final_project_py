@@ -110,6 +110,7 @@ class Gestion_Salle:
                                         salle_de_cours = datas_batiment[0][3] + 1)
                             break
                     break
+                break
             else:
                 while True:
                     print(' '*20,f"Le Batiment {batiment} n'est pas \
@@ -284,9 +285,7 @@ class Gestion_Salle:
                 break
 
             elif choix == '7':
-                print(' '*20,"Fermeture du programme...")
-                attendre_touche()
-                exit()
+                func_exit()
             else:
                 print(' '*20,"Entrée invalide, Veuillez choisir entre les options proposées.")
 

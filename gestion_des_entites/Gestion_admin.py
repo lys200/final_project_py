@@ -15,25 +15,34 @@ class Gestion_admin(Person):
 
     def connection_adm(self):
         """Methode permettant de connecter des administrateurs."""
-        id_adm = is_empty("Entrer votre id(x pour quitter): ")
+        while True:
+            id_adm = is_empty("Entrer votre id(x pour quitter): ")
 
-        if id_adm == 'x':
-            return
-        is_adm = db.search_by_data(self.curseur, "Administrateurs", "id_admin",id_adm,)
-
-        if is_adm:
-            mdp = is_empty("Entrer votre mot de passe:(x pour quitter):")
-            if mdp == 'x':
+            if id_adm.lower() == 'x':
                 return
-            if hash_password(mdp) == is_adm[0][4]:
-                print(' '*30,"Connexion reussie!")
-                print(' '*20,f"Bienvenue {is_adm[0][2]} {is_adm[0][3]}!")
-                return id_adm
-            print('\n',' '*20,"Mot de passe incorrect")
-            return False
-        else:
-            print('\n',' '*20,"Id invalide.")
-            return False
+            if db.verify_data(self.curseur, "Administrateurs", "id_admin", id_adm):
+                is_adm = db.search_by_data(self.curseur, "Administrateurs", "id_admin",id_adm,)
+
+                mdp = is_empty("Entrer votre mot de passe:(x pour quitter):")
+                if mdp == 'x':
+                    return
+                if hash_password(mdp) == is_adm[0][4]:
+                    print(' '*30,"Connexion reussie!")
+                    print(' '*20,f"Bienvenue {is_adm[0][2]} {is_adm[0][3]}!")
+                    return id_adm
+                print('\n',' '*20,"Mot de passe incorrect")
+                return False
+            else:
+                print('\n',' '*20,"Id invalide.")
+                print('\n',' '*20,"1- Reessayer    2- Abandonner.")
+                ch = is_empty("Faites un choix")
+                if ch == '1':
+                    pass
+                elif ch == '2':
+                    return
+                else:
+                    print('\n',' '*20,"Choix invalide.\n")
+
 
     def new_adm_account(self):
         """Methode permettant d'ajouter un nouveau administrateur."""

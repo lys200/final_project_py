@@ -187,7 +187,7 @@ class Gestion_Horaire:
                 db.insert_data(self.connection_db, "Horaire", code_cours = cours, nom_cours = cours_datas[0][2], code_salle = salle, jour = jour, heure_debut = debut, heure_fin = heure_finale, session = session, annee = annee)
 
     def modifier(self):        
-        """Modify les infos d'un Professeur."""
+        """Modify les infos d'un Horaire."""
         id_horaire = is_empty("Entrer le id de l'horaire a modifier:(x pour quitter) ").lower()
         if id_horaire == 'x':
             return
@@ -391,7 +391,7 @@ class Gestion_Horaire:
                     attendre_touche()
                     
         else:
-            print(' '*20,"Cette horaire n'est pas enregistrée dans la base de données.")
+            print(' '*20,"Cet horaire n'est pas enregistrée dans la base de données.")
         attendre_touche()
 
     def lister(self):
@@ -400,7 +400,7 @@ class Gestion_Horaire:
         if datas:
             print(' '*20,"\tVoici les cours programmés dans l'horaire:\n ")
 
-            placeholders = ['indexes','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
+            placeholders = ['id Horaire','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
             largeur, separateur = afficher_entete(placeholders)
             afficher_donnees(datas, largeur, separateur)
         else:
@@ -411,12 +411,13 @@ class Gestion_Horaire:
         while True:
             clear_screen()
             banner()
-            print("\tGestion Horaire")
-            print('\n','*'*15)
+            print(' '*10, "Gestion Horaire")
+            print(' '*10, "***************\n")
             print(' '*20,'-'*8,"MENU FILTRER HORAIRE",'-'*8)
             print(' '*20,'-'*38)
+            print()
             print(' '*20,"Pour faire une recherche par filtre , vous devez choisir entre les parmi options suivantes: ")
-            print(' '*20,"1- Rechercher une horaire par son id.")
+            print(' '*20,"1- Rechercher un horaire par son id.")
             print(' '*20,"2- Afficher les horaires d'une salle.")
             print(' '*20,"3- Afficher les horaires d'un cours.")
             print(' '*20,"4- Afficher les horaires d'une faculte.")
@@ -432,17 +433,17 @@ class Gestion_Horaire:
                 hor = is_empty("Entrer l'id de l'horaire a afficher: ")
                 if db.verify_data(self.connection_db, "Horaire", "id", hor):
                     datas = db.search_by_data(self.connection_db, "Horaire","id", hor)
-                    placeholders = ['indexes','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
+                    placeholders = ['id Horaire','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
                     largeur, separateur = afficher_entete(placeholders)
                     afficher_donnees(datas, largeur, separateur)
                 else:
-                    print(' '*20,"Cette horaire n'est pas enregistrée dans la base de données.")
+                    print(' '*20,"Cet horaire n'est pas enregistrée dans la base de données.")
             
             elif choix == '2':
                 salle = is_empty("Entrer l'id de la salle dont vous voullez afficher l'horaire: ")
                 if db.verify_data(self.connection_db, "Horaire", "code_salle", salle):
                     datas = db.search_by_data(self.connection_db, "Horaire","code_salle", salle)
-                    placeholders = ['indexes','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
+                    placeholders = ['id Horaire','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
                     largeur, separateur = afficher_entete(placeholders)
                     afficher_donnees(datas, largeur, separateur)
                 else:
@@ -452,7 +453,7 @@ class Gestion_Horaire:
                 cours = is_empty("Entrer l'id du cours dont vous voullez afficher l'horaire: ")
                 if db.verify_data(self.connection_db, "Horaire", "code_cours", cours):
                     datas = db.search_by_data(self.connection_db, "Horaire","code_cours", cours)
-                    placeholders = ['indexes','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
+                    placeholders = ['id Horaire','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
                     largeur, separateur = afficher_entete(placeholders)
                     afficher_donnees(datas, largeur, separateur)
                 else:
@@ -467,7 +468,7 @@ class Gestion_Horaire:
                     for data in datas:
                         display_list_columns(data)
                 else:
-                    print(' '*20,f"Aucune horaire n'est enregistrée pour les cours de la fac {fac}")
+                    print(' '*20,f"Aucun horaire n'est enregistrée pour les cours de la fac {fac}")
                 # datas = db.search_by_data(self.connection_db, "Horaire","code_cours", salle)
                 # placeholders = ['|indexes','|code du cours','|nom du cours' ,"|code de la salle" ,'|jour' ,'|heure de début', '|heure de fin', '|session', '|année']
                 # display_list_columns(placeholders)
@@ -479,12 +480,12 @@ class Gestion_Horaire:
                 if db.verify_data(self.connection_db, "Batiment", "id_batiment", bat):
                     datas = db.get_column_values_starting_with(self.connection_db, "Horaire", "code_salle", bat)
                     if datas:
-                        placeholders = ['indexes','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
+                        placeholders = ['id Horaire','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
                         display_list_columns(placeholders)
                         for data in datas:
                             display_list_columns(data)
                     else:
-                        print(' '*20,f"aucune horaire n'est encore enregistré pour le batiment {bat}")
+                        print(' '*20,f"Aucun horaire n'est encore enregistré pour le batiment {bat}")
                 else:
                     print(' '*20,"Ce batiment n'est pas encore enregistré.")
  
@@ -492,17 +493,17 @@ class Gestion_Horaire:
                 niveau = is_empty("Entrer le niveau dont vous voullez afficher les horaires: ")
                 datas =  db.afficher_horaires(self.connection_db, niveau=niveau)
                 if datas:
-                    placeholders = ['indexes','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
+                    placeholders = ['id Horaire','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
                     largeur, separateur = afficher_entete(placeholders)
                     afficher_donnees(datas, largeur, separateur)
                 else:
-                    print(' '*20,"Aucune horaire n'est enregistré pour ce niveau.")
+                    print(' '*20,"Aucun horaire n'est enregistré pour ce niveau.")
 
             elif choix == '7':
                 session = is_empty("Entrer la session [1-2]: ")
                 if session == '1' or session == '2':
                     datas = db.search_by_data(self.connection_db, "Horaire","session", session)
-                    placeholders = ['indexes','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
+                    placeholders = ['id Horaire','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
                     largeur, separateur = afficher_entete(placeholders)
                     afficher_donnees(datas, largeur, separateur)
                 else:
@@ -517,12 +518,12 @@ class Gestion_Horaire:
                     else: 
                         datas = db.search_by_data(self.connection_db, "Horaire","annee", annee)
                         if datas:
-                            placeholders = ['indexes','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
+                            placeholders = ['id Horaire','code du cours','nom du cours' ,"code de la salle" ,'  jour   ' ,'heure de début', 'heure de fin', 'session', 'année']
                             display_list_columns(placeholders)
                             for data in datas:
                                 display_list_columns(data)
                         else:
-                            print(' '*20,f"Aucune horaire n'est enregistrée pour l'année {annee}.")
+                            print(' '*20,f"Aucun horaire n'est enregistré pour l'année {annee}.")
                         break
             elif choix == '9':
                 break
@@ -535,7 +536,7 @@ class Gestion_Horaire:
             attendre_touche()
     
     def supprimer(self):
-        """Supprime une horaire , et toutes ses occurences dans les autres tables."""
+        """Supprime un horaire."""
         hor = is_empty("Entrer l'id de l'horaire a supprimer:(x pour quitter) ")
         if hor == 'x':
             return
@@ -552,7 +553,7 @@ class Gestion_Horaire:
                 else:
                     print(' '*20,"Vous devez choisir entre les options 1 et 2.")
         else:
-            print(' '*20,"Cette id d'horaire n'est pas enregistré dans la base de données.")
+            print(' '*20,"Cet id d'horaire n'est pas enregistré dans la base de données.")
   
     def menu_horaire (self) :
         """Fonction affichant les options de gestion des Professeurs."""
@@ -566,7 +567,7 @@ class Gestion_Horaire:
             print(' '*20,"Veuillez choisir votre option.")
             print(' '*20,"1- Enregistrer un cours dans l'horaire [admin].")
             print(' '*20,"2- Afficher tous les horaires.")
-            print(' '*20,"3- Rechercher une horaire.")
+            print(' '*20,"3- Rechercher un horaire.")
             print(' '*20,"4- Modifier une information dans l'horaire[admin].")
             print(' '*20,"5- Supprimer un cours de l'horaire[admin].")
             print(' '*20,"6- Retour au menu principal.")
@@ -620,7 +621,27 @@ class Gestion_Horaire:
                         if choix == 1:
                             print(' '*20,"Accès interdit. Seuls les admins peuvent faire des enregistrements.\n")
                         elif choix == 2:
-                            self.lister()
+                            while True:
+                                clear_screen()
+                                banner()
+                                print(" "*20, "----AFFICHER HORAIRE----\n")
+                                print(' '*20,"1- Afficher la liste générale des horaires.")
+                                print(' '*20,"2- Afficher la grille des horaires, triées par session, niveau et faculté.")
+                                choix = is_empty("Faites un choix: ")
+                                if choix == '1':
+                                    clear_screen()
+                                    banner()
+                                    self.lister()
+                                    break
+                                elif choix == '2':
+                                    clear_screen()
+                                    banner()
+                                    print(' '*20, "Voici la grille des horaires, triées par session, niveau et faculté. ")
+                                    db.afficher_horaire(self.connection_db)
+                                    break
+                                else:
+                                    print(' '*20, "Veuillez choisir entre 1 et 2.")
+                            attendre_touche()
                         elif choix == 3:
                             self.rechercher()
                         elif choix == 4:
