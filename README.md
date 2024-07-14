@@ -17,9 +17,8 @@ les horaires au sein du Campus Henri Christophe de Limonade.
 Muni de plusieurs fonctionnalités, il vous offre un aperçu sur l'organisation académique  du Campus.
 Que vous vous connectiez en tant qu'administrateur ou invité, vous serez satisfait de votre expérience.
 
-------- IMPORTANT--------
-Le code d'acces generale pour acceder au menu des administrateurs est : 
-!!!no pain no gain
+            !!! IMPORTANT
+Le code d'acces generale pour acceder au menu des administrateurs est : "no pain no gain"
 
 
 Fonctionnalités
