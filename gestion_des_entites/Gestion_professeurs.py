@@ -57,7 +57,7 @@ class Gestion_Professeur:
         datas = db.read_database(self.connection, "Professeurs")
         if datas:
             print(' '*20,"Voici les informations enregistrées concernant les Professeurs:\n ")
-            placeholders = ['indexes','id du prof','nom du Prof' ,"prenom du prof" ,'telephone    ' ,'email du prof                  ']
+            placeholders = ['indexes', 'id du prof', 'nom du Prof', "prenom du prof", 'telephone ', 'email du prof                  ']
             largeur, separateur = afficher_entete(placeholders)
             afficher_donnees(datas, largeur, separateur)
         else:

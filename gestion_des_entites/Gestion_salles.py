@@ -9,6 +9,9 @@ ST-PREUX Christine
 
 
 import Databases_pack.database as db
+<<<<<<< HEAD
+from gestion_des_contraintes.contraintes import is_empty, banner,is_integer, afficher_donnees, afficher_entete,afficher_texte_progressivement, attendre_touche, clear_screen
+=======
 from gestion_des_contraintes.contraintes \
 import (is_empty, banner,is_integer, afficher_donnees, afficher_entete,
         afficher_texte_progressivement, attendre_touche, clear_screen, func_exit)
